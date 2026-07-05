@@ -301,8 +301,8 @@ NEXT_PUBLIC_API_BASE_URL=https://omniedge-routeiq-backend.onrender.com
 | Member | Ownership |
 |---|---|
 | Rama Chandra | Founder/Product Lead, backend architecture, routing logic, API integration, final submission strategy |
-| Naboth / Nabothan | Frontend, UI/UX, Command Nexus dashboard |
-| Ria / Rameen | QA, demo video script, submission story, judging alignment, and backend simulation review |
+| Nabothanan | Frontend, UI/UX, Command Nexus dashboard |
+| Rameen | QA, demo video script, submission story, judging alignment, and backend simulation review |
 
 ---
 
