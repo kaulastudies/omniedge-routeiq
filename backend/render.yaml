@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: omniedge-routeiq-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /status
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: CORS_ORIGINS
+        value: '["https://omniedge-routeiq.vercel.app"]'
