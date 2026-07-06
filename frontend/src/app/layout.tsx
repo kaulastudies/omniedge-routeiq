@@ -9,19 +9,11 @@ export const metadata: Metadata = {
   description: "Monitor and simulate AI routing intelligence in real-time.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
           <div id="root">{children}</div>
         </ThemeProvider>
       </body>

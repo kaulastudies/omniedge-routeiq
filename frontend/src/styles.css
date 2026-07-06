@@ -1,0 +1,169 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Dashboard-specific semantic tokens */
+  --color-canvas: var(--canvas);
+  --color-shell: var(--shell);
+  --color-shell-2: var(--shell-2);
+  --color-shell-fg: var(--shell-fg);
+  --color-shell-muted: var(--shell-muted);
+  --color-tile: var(--tile);
+  --color-tile-fg: var(--tile-fg);
+  --color-tile-muted: var(--tile-muted);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-softer: var(--brand-softer);
+  --color-court: var(--court);
+  --color-court-line: var(--court-line);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-active: var(--sidebar-active);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Base shadcn tokens */
+  --background: oklch(0.98 0.005 90);
+  --foreground: oklch(0.2 0.02 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.02 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.02 250);
+  --primary: oklch(0.55 0.18 25);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.96 0.005 250);
+  --secondary-foreground: oklch(0.2 0.02 250);
+  --muted: oklch(0.96 0.005 250);
+  --muted-foreground: oklch(0.55 0.02 250);
+  --accent: oklch(0.96 0.005 250);
+  --accent-foreground: oklch(0.2 0.02 250);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.008 250);
+  --input: oklch(0.92 0.008 250);
+  --ring: oklch(0.65 0.05 250);
+
+  /* Dashboard tokens (light theme extracted from reference) */
+  --canvas: oklch(0.965 0.005 90);              /* outer page bg, warm off-white */
+  --shell: oklch(0.68 0.03 245);                /* main dashboard panel top */
+  --shell-2: oklch(0.58 0.035 250);             /* main dashboard panel bottom */
+  --shell-fg: oklch(0.99 0 0);                  /* white text on shell */
+  --shell-muted: oklch(0.88 0.01 245);          /* muted text on shell */
+  --tile: oklch(1 0 0);                         /* inner white tiles */
+  --tile-fg: oklch(0.22 0.02 250);              /* dark text on tiles */
+  --tile-muted: oklch(0.55 0.015 250);          /* muted text on tiles */
+  --brand: oklch(0.58 0.19 25);                 /* signature red */
+  --brand-soft: oklch(0.82 0.11 20);            /* mid pinkish red */
+  --brand-softer: oklch(0.94 0.04 20);          /* very pale pink bar bg */
+  --court: oklch(0.38 0.06 255);                /* court fill navy */
+  --court-line: oklch(0.85 0.02 245);           /* court white lines */
+  --sidebar-fg: oklch(0.95 0.005 245);
+  --sidebar-active: oklch(0.99 0 0);
+}
+
+.dark {
+  --background: oklch(0.14 0.015 250);
+  --foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.2 0.02 250);
+  --card-foreground: oklch(0.97 0.005 250);
+  --popover: oklch(0.2 0.02 250);
+  --popover-foreground: oklch(0.97 0.005 250);
+  --primary: oklch(0.65 0.2 25);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.28 0.02 250);
+  --secondary-foreground: oklch(0.97 0.005 250);
+  --muted: oklch(0.28 0.02 250);
+  --muted-foreground: oklch(0.7 0.02 250);
+  --accent: oklch(0.28 0.02 250);
+  --accent-foreground: oklch(0.97 0.005 250);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.55 0.03 250);
+
+  /* Dashboard tokens (DARK theme overriding) */
+  --canvas: oklch(0.14 0.015 250);              /* deep background */
+  --shell: oklch(0.20 0.02 250);                /* shell top-left gradient */
+  --shell-2: oklch(0.15 0.02 250);              /* shell bottom-right gradient */
+  --shell-fg: oklch(0.96 0.005 250);            /* off-white text to avoid glare */
+  --shell-muted: oklch(0.70 0.015 250);         /* muted shell text */
+  --tile: oklch(0.23 0.02 250);                 /* surface elevation for cards */
+  --tile-fg: oklch(0.96 0.005 250);             /* bright off-white tile text */
+  --tile-muted: oklch(0.65 0.02 250);           /* dark mode muted tile text */
+  --brand: oklch(0.65 0.19 25);                 /* slightly brighter pop red */
+  --brand-soft: oklch(0.35 0.10 20);            /* low elevation red */
+  --brand-softer: oklch(0.26 0.04 20);          /* minimal elevation red */
+  --court: oklch(0.18 0.02 250);                /* very dark court fill */
+  --court-line: oklch(0.28 0.02 250);           /* subtle court lines */
+  --sidebar-fg: oklch(0.96 0.005 250);
+  --sidebar-active: oklch(0.99 0 0);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@utility font-display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+@utility shell-gradient {
+  background: linear-gradient(
+    155deg,
+    color-mix(in oklab, var(--shell) 100%, transparent) 0%,
+    var(--shell-2) 100%
+  );
+}

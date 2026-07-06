@@ -16,8 +16,8 @@ export function TeamAdminCard() {
   };
 
   return (
-    <TileCard 
-      title="Simulation Console" 
+    <TileCard
+      title="Simulation Console"
       subtitle="Test AI routing logic live"
       tooltip="Run prompts against the backend routing engine to observe local vs fallback intelligence execution behavior."
     >
@@ -80,16 +80,16 @@ export function TeamAdminCard() {
               .filter((sim) => sim.id.toLowerCase().includes(searchQuery.toLowerCase()))
               .slice(0, 4)
               .map((sim) => (
-              <button
-                key={sim.id}
-                type="button"
-                onClick={() => runSimulation(sim.id)}
-                className="flex items-center justify-between rounded-lg border border-shell-muted/30 p-2 text-left text-[10px] text-tile-fg transition hover:border-brand/40 hover:bg-brand-softer/10"
-              >
-                <span className="truncate">{sim.id.replace(/_/g, " ")}</span>
-                <LuPlay className="shrink-0 text-brand" />
-              </button>
-            ))}
+                <button
+                  key={sim.id}
+                  type="button"
+                  onClick={() => runSimulation(sim.id)}
+                  className="flex items-center justify-between rounded-lg border border-shell-muted/30 p-2 text-left text-[10px] text-tile-fg transition hover:border-brand/40 hover:bg-brand-softer/10"
+                >
+                  <span className="truncate">{sim.id.replace(/_/g, " ")}</span>
+                  <LuPlay className="shrink-0 text-brand" />
+                </button>
+              ))}
           </div>
         </div>
       )}
