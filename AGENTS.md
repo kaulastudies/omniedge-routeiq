@@ -12,3 +12,7 @@ The backend implementation is considered complete and stable for this stage. All
 - Any new subpages, mobile layouts, or routing layers created in the frontend MUST completely follow the established design tokens and UI shell (`DashboardShell`, `TileCard`, etc.)
 - Zero deviations from the existing color palette, icon set, or component layout structure are allowed.
 - All functional action properties (like clicks, interactions) must be securely bound to hooks like `useRouteIQ` preserving the current flow structure constraint seamlessly.
+
+## Toasts and Feedback Notifications
+- When implementing toast notifications (e.g., using `sonner` via `toast()`), always ensure toasts are **deduplicated**.
+- If the exact same message triggers multiple times, it must only appear once in the UI stack. You should provide a static `id` property based on the error or message content, like `toast.error(msg, { id: msg })`, to guarantee a clean and spam-free notification experience.

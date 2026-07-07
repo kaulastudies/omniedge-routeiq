@@ -102,42 +102,42 @@
 }
 
 .dark {
-  --background: oklch(0.14 0.015 250);
-  --foreground: oklch(0.97 0.005 250);
-  --card: oklch(0.2 0.02 250);
-  --card-foreground: oklch(0.97 0.005 250);
-  --popover: oklch(0.2 0.02 250);
-  --popover-foreground: oklch(0.97 0.005 250);
-  --primary: oklch(0.65 0.2 25);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.28 0.02 250);
-  --secondary-foreground: oklch(0.97 0.005 250);
-  --muted: oklch(0.28 0.02 250);
-  --muted-foreground: oklch(0.7 0.02 250);
-  --accent: oklch(0.28 0.02 250);
-  --accent-foreground: oklch(0.97 0.005 250);
+  --background: oklch(0.12 0 0); /* True Black/Zinc background */
+  --foreground: oklch(0.98 0 0);
+  --card: oklch(0.15 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --popover: oklch(0.15 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.12 0 0);
+  --secondary: oklch(0.20 0 0);
+  --secondary-foreground: oklch(0.98 0 0);
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.70 0 0);
+  --accent: oklch(0.20 0 0);
+  --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.65 0.2 25);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.55 0.03 250);
+  --border: oklch(0.22 0 0); /* Subtle stark borders */
+  --input: oklch(0.22 0 0);
+  --ring: oklch(0.35 0 0);
 
   /* Dashboard tokens (DARK theme overriding) */
-  --canvas: oklch(0.14 0.015 250);              /* deep background */
-  --shell: oklch(0.20 0.02 250);                /* shell top-left gradient */
-  --shell-2: oklch(0.15 0.02 250);              /* shell bottom-right gradient */
-  --shell-fg: oklch(0.96 0.005 250);            /* off-white text to avoid glare */
-  --shell-muted: oklch(0.70 0.015 250);         /* muted shell text */
-  --tile: oklch(0.23 0.02 250);                 /* surface elevation for cards */
-  --tile-fg: oklch(0.96 0.005 250);             /* bright off-white tile text */
-  --tile-muted: oklch(0.65 0.02 250);           /* dark mode muted tile text */
-  --brand: oklch(0.65 0.19 25);                 /* slightly brighter pop red */
-  --brand-soft: oklch(0.35 0.10 20);            /* low elevation red */
-  --brand-softer: oklch(0.26 0.04 20);          /* minimal elevation red */
-  --court: oklch(0.18 0.02 250);                /* very dark court fill */
-  --court-line: oklch(0.28 0.02 250);           /* subtle court lines */
-  --sidebar-fg: oklch(0.96 0.005 250);
-  --sidebar-active: oklch(0.99 0 0);
+  --canvas: oklch(0.11 0 0);              /* Deep background */
+  --shell: oklch(0.14 0 0);               /* Shell top-left */
+  --shell-2: oklch(0.12 0 0);             /* Shell bottom-right */
+  --shell-fg: oklch(0.98 0 0);            /* Crisp off-white text */
+  --shell-muted: oklch(0.68 0 0);         /* High contrast muted text */
+  --tile: oklch(0.16 0 0);                /* Surface elevation for cards */
+  --tile-fg: oklch(0.98 0 0);             /* Bright tile text */
+  --tile-muted: oklch(0.70 0 0);          /* Highly readable muted tile text */
+  --brand: oklch(0.70 0.16 25);           /* Sharp vibrant red brand highlight */
+  --brand-soft: oklch(0.30 0.10 25);      /* Low elevation brand */
+  --brand-softer: oklch(0.20 0.05 25);    /* Minimal elevation brand */
+  --court: oklch(0.15 0 0);               
+  --court-line: oklch(0.24 0 0);          
+  --sidebar-fg: oklch(0.96 0 0);
+  --sidebar-active: oklch(1 0 0);
 }
 
 @layer base {
@@ -166,4 +166,25 @@
     color-mix(in oklab, var(--shell) 100%, transparent) 0%,
     var(--shell-2) 100%
   );
+}
+
+@layer components {
+  /* Premium Metric Cards - Linear/Stripe Style Depth */
+  .bg-tile {
+    box-shadow: 0 4px 24px -8px rgb(0 0 0 / 0.5), inset 0 1px 0 0 rgb(255 255 255 / 0.04) !important;
+    border: 1px solid var(--color-border) !important;
+  }
+
+  /* Improve Audit Timeline & Provider Health readability globally */
+  .text-\[10px\] {
+    font-size: 10.5px !important;
+  }
+  .text-\[11px\] {
+    font-size: 11.5px !important;
+  }
+
+  /* Enhanced crispness typical of enterprise SaaS */
+  * {
+    text-rendering: optimizeLegibility;
+  }
 }
