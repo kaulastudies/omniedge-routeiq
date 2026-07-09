@@ -98,5 +98,5 @@ export type RouteRequestParams = {
   task_type: string;
   privacy_level: string;
   max_latency_ms?: number;
-  prefer_local?: boolean;
+  force_route?: string;
 };

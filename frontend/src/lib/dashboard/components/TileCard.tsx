@@ -1,4 +1,3 @@
-import { LuEllipsis } from "react-icons/lu";
 import type { IconType } from "react-icons";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
@@ -43,15 +42,7 @@ export function TileCard({
             )}
             {subtitle && <p className="mt-1 text-[11px] text-tile-muted">{subtitle}</p>}
           </div>
-          {action === "more" && (
-            <button
-              type="button"
-              aria-label="More"
-              className="grid h-6 w-6 place-items-center rounded-full text-tile-muted hover:bg-black/5"
-            >
-              <LuEllipsis size={14} />
-            </button>
-          )}
+          {/* More action removed as they are non-functional */}
           {action === "icon" && Icon && (
             <div className="grid h-6 w-6 place-items-center rounded-full bg-black/90 text-white">
               <Icon size={12} />

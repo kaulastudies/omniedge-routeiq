@@ -1,6 +1,6 @@
 import { TileCard } from "./TileCard";
 import { useRouteIQ } from "@/hooks/use-route-iq";
-import { LuCheck, LuX, LuActivity } from "react-icons/lu";
+import { PiActivity, PiCheckCircle, PiXCircle } from "react-icons/pi";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function CourtCard() {
@@ -28,7 +28,7 @@ export function CourtCard() {
         ) : (
           <>
             <div className="flex items-center gap-3 rounded-xl border border-shell-muted/20 bg-canvas p-3">
-              <LuActivity className="text-brand" />
+              <PiActivity className="text-brand text-[22px]" />
               <div className="flex-1">
                 <p className="text-xs font-semibold text-tile-fg">Router Engine</p>
                 <p className="text-[10px] text-tile-muted">
@@ -51,9 +51,9 @@ export function CourtCard() {
                 >
                   <div className="flex items-center gap-2">
                     {p.available ? (
-                      <LuCheck className="h-4 w-4 text-emerald-500" />
+                      <PiCheckCircle className="h-4 w-4 text-emerald-500" />
                     ) : (
-                      <LuX className="h-4 w-4 text-rose-500" />
+                      <PiXCircle className="h-4 w-4 text-rose-500" />
                     )}
                     <span className="text-sm text-tile-fg font-medium capitalize">{p.name}</span>
                   </div>

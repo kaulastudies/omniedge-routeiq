@@ -1,6 +1,6 @@
 import { TileCard } from "./TileCard";
 import { useRouteIQ } from "@/hooks/use-route-iq";
-import { LuCheck, LuClock } from "react-icons/lu";
+import { PiCheckCircle, PiClock } from "react-icons/pi";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -11,8 +11,8 @@ export function LiveViewsCard() {
   return (
     <TileCard
       title="Audit Timeline"
-      subtitle="Routing step execution trace"
-      tooltip="Chronological pipeline trace for the last executed AI routing decision. Highlights security guardrails, task classification phases, provider resolution, and execution timelines."
+      subtitle="Execution trace: Task → Gemma Layer → Fireworks Fallback"
+      tooltip="Chronological pipeline trace: Task → Local solver → Gemma local layer → Confidence check → Fireworks fallback → Final answer."
     >
       <div className="mt-4 flex h-56 w-full flex-col overflow-y-auto pr-2">
         {loading ? (
@@ -31,7 +31,7 @@ export function LiveViewsCard() {
           </div>
         ) : timeline.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-tile-muted">
-            <LuClock className="mb-2 text-2xl opacity-50" />
+            <PiClock className="mb-2 text-2xl opacity-50" />
             <p className="text-sm">Run a decision to view audit timeline</p>
           </div>
         ) : (
@@ -39,7 +39,7 @@ export function LiveViewsCard() {
             {timeline.map((event, idx) => (
               <div key={idx} className="relative pl-6">
                 <span className="absolute -left-[11px] top-1 flex h-5 w-5 items-center justify-center rounded-full bg-canvas ring-4 ring-canvas">
-                  <LuCheck className="h-4 w-4 text-brand" />
+                  <PiCheckCircle className="h-4 w-4 text-brand" />
                 </span>
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between text-sm">

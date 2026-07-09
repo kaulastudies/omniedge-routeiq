@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { LuInfo } from "react-icons/lu";
+import { PiInfo } from "react-icons/pi";
 
 interface InfoTooltipProps {
   content: ReactNode;
@@ -23,7 +23,7 @@ export function InfoTooltip({ content, children, side = "top" }: InfoTooltipProp
               className="text-shell-muted/70 transition hover:text-shell-fg focus:outline-none"
               aria-label="Information"
             >
-              <LuInfo size={14} />
+              <PiInfo size={14} />
             </button>
           )}
         </TooltipTrigger>

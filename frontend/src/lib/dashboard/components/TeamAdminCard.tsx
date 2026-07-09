@@ -2,29 +2,25 @@ import { useState, useEffect } from "react";
 import { TileCard } from "./TileCard";
 import { toast } from "sonner";
 import { useRouteIQ } from "@/hooks/use-route-iq";
-import { LuPlay } from "react-icons/lu";
-import { Loader2, AlertCircle } from "lucide-react";
+import { PiPlayCircle } from "react-icons/pi";
+import { PiSpinner } from "react-icons/pi";
 
-const SCENARIO_META: Record<string, { title: string; tag: string; color: string }> = {
-  local_sensitive_prompt: { 
-    title: "Privacy-first Local", 
-    tag: "Local", 
-    color: "text-emerald-500" 
+const SCENARIO_META: Record<string, { title: string; tag: string }> = {
+  local_sensitive_prompt: {
+    title: "Gemma High Confidence",
+    tag: "Local",
   },
-  cloud_complex_architecture: { 
-    title: "Cloud Architecture", 
-    tag: "Cloud", 
-    color: "text-blue-500" 
+  cloud_complex_architecture: {
+    title: "Fireworks Fallback",
+    tag: "Cloud",
   },
-  hybrid_confidential_code: { 
-    title: "Hybrid Confidential", 
-    tag: "Hybrid", 
-    color: "text-purple-500" 
+  hybrid_confidential_code: {
+    title: "Hybrid Trace",
+    tag: "Hybrid",
   },
-  fallback_no_key_demo: { 
-    title: "Fallback Demo", 
-    tag: "Fallback", 
-    color: "text-amber-500" 
+  fallback_no_key_demo: {
+    title: "Force Fallback Demo",
+    tag: "Fallback",
   },
 };
 
@@ -43,11 +39,12 @@ export function TeamAdminCard() {
 
   useEffect(() => {
     if (error) {
-      const isNetworkError = error.toLowerCase().includes("fetch") || error.toLowerCase().includes("network");
+      const isNetworkError =
+        error.toLowerCase().includes("fetch") || error.toLowerCase().includes("network");
       toast.error(isNetworkError ? "Backend Cold Start" : "Routing Error", {
         description: isNetworkError
           ? "The routing engine is waking up. Please try again in 10-15 seconds."
-          : "Unable to complete route decision. Please check backend connection.",
+          : error,
         id: error,
       });
     }
@@ -56,15 +53,15 @@ export function TeamAdminCard() {
   return (
     <TileCard
       title="Simulation Console"
-      subtitle="Test AI routing logic live"
-      tooltip="Run prompts against the backend routing engine to observe local vs fallback intelligence execution behavior."
+      subtitle="Test Gemma vs Fireworks routing logic"
+      tooltip="Run prompts to test RouteIQ's flow: Local Solver → Gemma Layer → Confidence Check → Fireworks Fallback. Watch how local-first saves tokens."
     >
       <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Enter prompt to evaluate..."
-          className="min-h-[80px] w-full resize-none rounded-xl border border-shell-muted/30 bg-slate-50 p-3 text-sm text-tile-fg outline-none focus:border-brand/40 dark:bg-slate-900"
+          className="min-h-[80px] w-full resize-none rounded-xl border border-border bg-canvas p-3 text-sm text-tile-fg outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition-all"
           required
         />
 
@@ -76,7 +73,7 @@ export function TeamAdminCard() {
             <select
               value={privacy}
               onChange={(e) => setPrivacy(e.target.value)}
-              className="w-full rounded-xl border border-shell-muted/30 bg-slate-50 px-3 py-2 text-sm text-tile-fg outline-none focus:border-brand/40 transition-colors dark:bg-slate-900"
+              className="w-full rounded-xl border border-border bg-canvas px-3 py-2 text-sm text-tile-fg outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition-all"
             >
               <option value="public">Public</option>
               <option value="internal">Internal</option>
@@ -91,7 +88,7 @@ export function TeamAdminCard() {
             <select
               value={taskType}
               onChange={(e) => setTaskType(e.target.value)}
-              className="w-full rounded-xl border border-shell-muted/30 bg-slate-50 px-3 py-2 text-sm text-tile-fg outline-none focus:border-brand/40 transition-colors dark:bg-slate-900"
+              className="w-full rounded-xl border border-border bg-canvas px-3 py-2 text-sm text-tile-fg outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/30 transition-all"
             >
               <option value="general">General</option>
               <option value="code">Code / Development</option>
@@ -104,27 +101,26 @@ export function TeamAdminCard() {
         <button
           disabled={loading || !prompt}
           type="submit"
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-shell-2 py-2.5 text-sm font-semibold text-shell-fg transition hover:bg-shell disabled:opacity-50"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90 disabled:opacity-50"
         >
-          {loading && !activeSimId && <Loader2 className="animate-spin" />}
+          {loading && !activeSimId && <PiSpinner className="h-4 w-4 animate-spin" />}
           {loading && !activeSimId ? "Routing..." : "Run Route Decision"}
         </button>
       </form>
 
       {simulations.length > 0 && (
-        <div className="mt-5 space-y-2 border-t border-shell-muted/20 pt-4">
+        <div className="mt-5 space-y-2 border-t border-border pt-4">
           <p className="pl-1 text-[10px] font-semibold uppercase tracking-widest text-tile-muted">
             Built-in Scenarios
           </p>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
             {simulations
               .filter((sim) => sim.id.toLowerCase().includes(searchQuery.toLowerCase()))
               .slice(0, 4)
               .map((sim) => {
-                const meta = SCENARIO_META[sim.id] || { 
-                  title: sim.id, 
-                  tag: "Scenario", 
-                  color: "text-shell-muted" 
+                const meta = SCENARIO_META[sim.id] || {
+                  title: sim.id,
+                  tag: "Scenario",
                 };
                 const isRunning = activeSimId === sim.id;
 
@@ -137,28 +133,32 @@ export function TeamAdminCard() {
                       setActiveSimId(sim.id);
                       runSimulation(sim.id).finally(() => setActiveSimId(null));
                     }}
-                    className={`group flex items-center justify-between rounded-lg px-2 py-2 text-left transition ${
-                      isRunning 
-                        ? "bg-black/5 dark:bg-white/5" 
-                        : "hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-50"
+                    className={`group flex items-center justify-between rounded-xl border border-transparent px-3 py-2.5 text-left transition-all ${
+                      isRunning
+                        ? "bg-brand-softer border-brand/20"
+                        : "hover:bg-canvas hover:border-border disabled:opacity-50"
                     }`}
                   >
-                    <div className="flex flex-col items-start gap-1 overflow-hidden">
+                    <div className="flex flex-col items-start gap-1.5 overflow-hidden">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-tile-fg">{meta.title}</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest ${meta.color}`}>
+                        <span
+                          className={`text-sm font-semibold ${isRunning ? "text-brand" : "text-tile-fg"} transition-colors`}
+                        >
+                          {meta.title}
+                        </span>
+                        <span className="rounded bg-brand-softer px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-brand">
                           {meta.tag}
                         </span>
                       </div>
-                      <p className="line-clamp-1 w-full text-[10px] text-tile-muted">
+                      <p className="line-clamp-1 w-full text-[11px] text-tile-muted">
                         {sim.prompt_preview || sim.id}
                       </p>
                     </div>
                     <div className="shrink-0 pl-3">
                       {isRunning ? (
-                        <Loader2 className="h-4 w-4 animate-spin text-brand" />
+                        <PiSpinner className="h-4 w-4 animate-spin text-brand" />
                       ) : (
-                        <LuPlay className="h-4 w-4 text-tile-muted opacity-60 transition group-hover:text-brand group-hover:opacity-100" />
+                        <PiPlayCircle className="h-4 w-4 text-tile-muted opacity-40 transition group-hover:text-brand" />
                       )}
                     </div>
                   </button>

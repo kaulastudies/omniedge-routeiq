@@ -23,7 +23,7 @@ interface RouteIQState {
   runSimulation: (id: string) => Promise<void>;
 }
 
-export const useRouteIQ = create<RouteIQState>((set) => ({
+export const useRouteIQ = create<RouteIQState>((set, get) => ({
   status: null,
   metrics: null,
   simulations: [],
@@ -58,9 +58,8 @@ export const useRouteIQ = create<RouteIQState>((set) => ({
       const result = await RouteIQApi.runRoute(params);
       set({ routeResult: result });
 
-      // Auto-refresh metrics to reflect new route
-      const metrics = await RouteIQApi.getMetrics().catch(() => null);
-      if (metrics) set({ metrics });
+      // Auto-refresh ALL state
+      await get().refreshData();
     } catch (e) {
       set({ error: e instanceof Error ? e.message : "Failed to run route" });
     } finally {
@@ -74,9 +73,8 @@ export const useRouteIQ = create<RouteIQState>((set) => ({
       const result = await RouteIQApi.runSimulation(id);
       set({ routeResult: result });
 
-      // Auto-refresh metrics
-      const metrics = await RouteIQApi.getMetrics().catch(() => null);
-      if (metrics) set({ metrics });
+      // Auto-refresh ALL state
+      await get().refreshData();
     } catch (e) {
       set({ error: e instanceof Error ? e.message : "Failed to run simulation" });
     } finally {

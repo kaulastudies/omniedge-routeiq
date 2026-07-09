@@ -1,16 +1,16 @@
 import { create } from "zustand";
-import { LuLayoutGrid, LuUsers, LuUser, LuSwords } from "react-icons/lu";
+import { PiSquaresFour, PiUsers, PiUser, PiSword } from "react-icons/pi";
 import type { IconType } from "react-icons";
 
 export type NavItem = { id: string; label: string; icon: IconType };
-export type Team = { name: string; matches: number };
+export type Provider = { name: string; executions: number };
 export type RegionSlice = { label: string; percent: number };
 export type TrendPoint = { stage: string; views: number };
 export type SparkPoint = { x: number; y: number };
-export type Coach = { name: string; role: string; avatar: string };
+export type SystemAdmin = { name: string; role: string; avatar: string };
 
 type DashboardState = {
-  coach: Coach;
+  admin: SystemAdmin;
   nav: NavItem[];
   activeNavId: string;
   setActiveNav: (id: string) => void;
@@ -18,28 +18,28 @@ type DashboardState = {
   activeTab: string;
   setActiveTab: (t: string) => void;
   regions: RegionSlice[];
-  activeTeams: Team[];
+  activeProviders: Provider[];
   trend: TrendPoint[];
-  totalTeams: number;
-  totalTeamsSpark: SparkPoint[];
+  totalRoutes: number;
+  totalRoutesSpark: SparkPoint[];
   registeredPlayers: number;
   completion: number;
-  activeMatches: number;
-  activeMatchesBars: number[];
+  activeExecutions: number;
+  activeExecutionsBars: number[];
 };
 
 export const useDashboard = create<DashboardState>((set) => ({
-  coach: {
-    name: "Riya Kapoor",
-    role: "Coach",
+  admin: {
+    name: "RouteIQ Admin",
+    role: "System",
     avatar: "https://i.pravatar.cc/96?img=47",
   },
-  nav: [{ id: "overview", label: "Overview", icon: LuLayoutGrid }],
+  nav: [{ id: "overview", label: "Overview", icon: PiSquaresFour }],
   activeNavId: "overview",
   setActiveNav: (id) => set({ activeNavId: id }),
 
-  tabs: ["Compete", "Track", "Analyze", "Dominate", "Rank"],
-  activeTab: "Compete",
+  tabs: ["Simulation Console", "Routing", "Provider Health", "Audit Timeline", "Token Savings"],
+  activeTab: "Simulation Console",
   setActiveTab: (t) => set({ activeTab: t }),
 
   regions: [
@@ -51,24 +51,24 @@ export const useDashboard = create<DashboardState>((set) => ({
     { label: "Asia", percent: 21 },
   ],
 
-  activeTeams: [
-    { name: "Thunder FC", matches: 28 },
-    { name: "Phoenix United", matches: 26 },
-    { name: "Titan Sports", matches: 24 },
-    { name: "Strom Warriors", matches: 22 },
+  activeProviders: [
+    { name: "Local", executions: 28 },
+    { name: "Cloud", executions: 26 },
+    { name: "Hybrid", executions: 24 },
+    { name: "Fallback", executions: 22 },
   ],
 
   trend: [
-    { stage: "Qualifiers", views: 20000 },
-    { stage: "Round 32", views: 38000 },
-    { stage: "Round 16", views: 46000 },
-    { stage: "Quarter Finals", views: 92000 },
-    { stage: "Semi Finals", views: 138000 },
-    { stage: "Finals", views: 178000 },
+    { stage: "Received", views: 20000 },
+    { stage: "Classified", views: 38000 },
+    { stage: "Routed", views: 46000 },
+    { stage: "Provider Select", views: 92000 },
+    { stage: "Executed", views: 138000 },
+    { stage: "Logged", views: 178000 },
   ],
 
-  totalTeams: 128,
-  totalTeamsSpark: [
+  totalRoutes: 128,
+  totalRoutesSpark: [
     { x: 0, y: 40 },
     { x: 1, y: 55 },
     { x: 2, y: 30 },
@@ -83,8 +83,8 @@ export const useDashboard = create<DashboardState>((set) => ({
 
   registeredPlayers: 1500,
   completion: 68,
-  activeMatches: 24,
-  activeMatchesBars: [
+  activeExecutions: 24,
+  activeExecutionsBars: [
     30, 55, 40, 70, 45, 85, 60, 95, 50, 75, 40, 90, 65, 80, 55, 100, 45, 70, 35, 85,
   ],
 }));

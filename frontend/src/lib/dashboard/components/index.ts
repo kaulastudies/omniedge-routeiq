@@ -1,5 +1,5 @@
 /**
- * Public API of the tournament dashboard component library.
+ * Public API of the simulation console component library.
  *
  * Portability notes:
  * - No router-specific imports. Safe to lift into Next.js / any React app.

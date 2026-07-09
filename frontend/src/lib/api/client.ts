@@ -14,7 +14,10 @@ export class RouteIQApi {
    */
   static async getStatus(): Promise<StatusResponse> {
     const res = await fetch(`${API_BASE}/status`);
-    if (!res.ok) throw new Error("Failed to fetch status");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Failed to fetch status");
+    }
     return res.json();
   }
 
@@ -23,7 +26,10 @@ export class RouteIQApi {
    */
   static async getMetrics(): Promise<MetricsResponse> {
     const res = await fetch(`${API_BASE}/metrics`);
-    if (!res.ok) throw new Error("Failed to fetch metrics");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Failed to fetch metrics");
+    }
     return res.json();
   }
 
@@ -32,7 +38,10 @@ export class RouteIQApi {
    */
   static async getSimulations(): Promise<{ scenarios: Simulation[] }> {
     const res = await fetch(`${API_BASE}/simulations`);
-    if (!res.ok) throw new Error("Failed to fetch simulations");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Failed to fetch simulations");
+    }
     return res.json();
   }
 
@@ -45,7 +54,10 @@ export class RouteIQApi {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(params),
     });
-    if (!res.ok) throw new Error("Route request failed");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Route request failed");
+    }
     return res.json();
   }
 
@@ -56,7 +68,10 @@ export class RouteIQApi {
     const res = await fetch(`${API_BASE}/simulations/${id}`, {
       method: "POST",
     });
-    if (!res.ok) throw new Error("Simulation request failed");
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || "Simulation request failed");
+    }
     return res.json();
   }
 }

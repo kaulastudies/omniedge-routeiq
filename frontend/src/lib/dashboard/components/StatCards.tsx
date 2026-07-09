@@ -1,13 +1,13 @@
 import { Area, AreaChart, BarChart, Bar, ResponsiveContainer } from "recharts";
 import {
-  LuUser,
-  LuCircleDot,
-  LuActivity,
-  LuRoute,
-  LuZap,
-  LuClock,
-  LuTriangleAlert,
-} from "react-icons/lu";
+  PiUser,
+  PiCircleDashed,
+  PiActivity,
+  PiPath,
+  PiLightning,
+  PiClock,
+  PiWarning,
+} from "react-icons/pi";
 import { TileCard } from "./TileCard";
 import { useRouteIQ } from "@/hooks/use-route-iq";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +18,7 @@ export function TotalTeamsCard() {
   const totalRoutes = metrics?.total_requests || 0;
 
   // Dummy spark data for visual parity
-  const totalTeamsSpark = [
+  const totalRoutesSpark = [
     { x: 0, y: 40 },
     { x: 1, y: 55 },
     { x: 2, y: 30 },
@@ -32,7 +32,7 @@ export function TotalTeamsCard() {
   ];
 
   return (
-    <TileCard title="Total Routes" icon={LuRoute} action="icon">
+    <TileCard title="Total Routes" icon={PiPath} action="icon">
       {!metrics ? (
         <div className="mt-2 space-y-3">
           <Skeleton className="h-8 w-20" />
@@ -45,7 +45,7 @@ export function TotalTeamsCard() {
           </div>
           <div className="relative mt-2 h-16">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={totalTeamsSpark} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
+              <AreaChart data={totalRoutesSpark} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
                 <defs>
                   <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="var(--color-brand)" stopOpacity="0.25" />
@@ -85,9 +85,9 @@ export function RegisteredCard() {
   return (
     <TileCard
       title="Token Savings"
-      icon={LuZap}
+      icon={PiLightning}
       action="icon"
-      tooltip="Theoretical token calculation showing expected compute expenses successfully diverted away from costly cloud models."
+      tooltip="Tokens saved by successfully routing tasks to the Gemma local layer instead of defaulting to the Fireworks cloud fallback."
     >
       {!metrics ? (
         <div className="mt-2 space-y-3">
@@ -139,7 +139,7 @@ export function CompletionCard() {
   const pct = Math.min(100, Math.max(0, latency / 40));
 
   return (
-    <TileCard title="Avg Latency" icon={LuClock} action="icon">
+    <TileCard title="Avg Latency" icon={PiClock} action="icon">
       {!metrics ? (
         <div className="mt-2 space-y-3">
           <Skeleton className="h-8 w-24" />
@@ -186,7 +186,7 @@ export function ActiveMatchesCard() {
   const fallbacks = metrics?.fallback_count || 0;
 
   // Dummy chart details
-  const activeMatchesBars = [
+  const activeFallbacksBars = [
     30,
     55,
     40,
@@ -209,13 +209,13 @@ export function ActiveMatchesCard() {
     Math.max(10, fallbacks * 10),
   ];
 
-  const data = activeMatchesBars.map((v, i) => ({ i, v }));
+  const data = activeFallbacksBars.map((v, i) => ({ i, v }));
   return (
     <TileCard
-      title="Fallbacks"
-      icon={LuTriangleAlert}
+      title="Fireworks Fallbacks"
+      icon={PiWarning}
       action="icon"
-      tooltip="A reliability guard metric noting how many requests were safely intercepted and routed to a redundant backup engine due to an outage or rate limit."
+      tooltip="Number of times the Gemma local layer had low confidence, resulting in a safe fallback to Fireworks."
     >
       {!metrics ? (
         <div className="mt-2 space-y-3">
