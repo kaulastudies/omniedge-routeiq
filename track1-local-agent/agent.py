@@ -5,6 +5,7 @@ import json
 import math
 import operator
 import re
+import subprocess
 import os
 import sys
 import time
@@ -404,6 +405,472 @@ def try_local_answer(task):
     return None
 
 
+
+LLAMA_ANSI_PATTERN = re.compile(
+    r"\x1b\[[0-9;?]*[A-Za-z]"
+)
+
+
+def local_task_category(task):
+    raw = str(
+        task.get("task_type")
+        or task.get("category")
+        or task.get("type")
+        or ""
+    ).strip().lower()
+
+    normalized = (
+        raw.replace("-", "_")
+        .replace(" ", "_")
+        .replace("/", "_")
+    )
+
+    aliases = (
+        (
+            "code_debugging",
+            (
+                "code_debug",
+                "debugging",
+                "bug_fix",
+                "fix_code",
+            ),
+        ),
+        (
+            "code_generation",
+            (
+                "code_generation",
+                "generate_code",
+                "programming",
+            ),
+        ),
+        ("sentiment", ("sentiment",)),
+        ("summarization", ("summar",)),
+        (
+            "ner",
+            (
+                "named_entity",
+                "entity_extraction",
+                "ner",
+            ),
+        ),
+        (
+            "math",
+            (
+                "math",
+                "arithmetic",
+                "calculation",
+            ),
+        ),
+        (
+            "logic",
+            (
+                "logic",
+                "deductive",
+                "deduction",
+            ),
+        ),
+        (
+            "factual",
+            (
+                "factual",
+                "knowledge",
+                "question_answering",
+            ),
+        ),
+    )
+
+    for category, category_aliases in aliases:
+        if any(
+            alias in normalized
+            for alias in category_aliases
+        ):
+            return category
+
+    prompt = task_text(task).lower()
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "debug this",
+            "fix this code",
+            "fix the code",
+            "find the bug",
+            "correct the code",
+        )
+    ):
+        return "code_debugging"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "write a function",
+            "write a program",
+            "generate code",
+            "implement a function",
+            "create a function",
+        )
+    ):
+        return "code_generation"
+
+    if "sentiment" in prompt:
+        return "sentiment"
+
+    if "summarize" in prompt or "summary" in prompt:
+        return "summarization"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "named entities",
+            "extract entities",
+            "extract the person",
+            "extract the organization",
+            "ner",
+        )
+    ):
+        return "ner"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "calculate",
+            "compute",
+            "multiply",
+            "divided by",
+            "solve the equation",
+        )
+    ):
+        return "math"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "deduce",
+            "logically",
+            "syllogism",
+            "can we conclude",
+            "which conclusion",
+        )
+    ):
+        return "logic"
+
+    return "factual"
+
+
+def local_gemma_budget(category):
+    budgets = {
+        "factual": 64,
+        "sentiment": 24,
+        "summarization": 160,
+        "ner": 128,
+        "code_generation": 256,
+    }
+
+    return budgets.get(category, 96)
+
+
+def local_gemma_instruction(category):
+    instructions = {
+        "factual": (
+            "Answer accurately and directly. "
+            "Return only the requested answer."
+        ),
+        "sentiment": (
+            "Return only one label: "
+            "positive, negative, or neutral."
+        ),
+        "summarization": (
+            "Write a faithful concise summary and obey "
+            "the requested length and format."
+        ),
+        "ner": (
+            "Extract every requested named entity. "
+            "Do not omit organizations or people."
+        ),
+        "code_generation": (
+            "Generate correct executable code matching every "
+            "constraint. Return only the code."
+        ),
+    }
+
+    return instructions.get(
+        category,
+        "Return only the requested answer.",
+    )
+
+
+def extract_local_gemma_answer(output):
+    cleaned = LLAMA_ANSI_PATTERN.sub("", output)
+    lines = cleaned.splitlines()
+
+    start = None
+
+    for index, line in enumerate(lines):
+        if line.startswith("> "):
+            start = index + 1
+
+    if start is None:
+        return ""
+
+    answer_lines = []
+
+    for line in lines[start:]:
+        stripped = line.strip()
+
+        if stripped.startswith("[ Prompt:"):
+            break
+
+        if stripped == "Exiting...":
+            break
+
+        answer_lines.append(line)
+
+    return "\n".join(answer_lines).strip()
+
+
+def strip_code_fence(answer):
+    value = answer.strip()
+
+    if not value.startswith("```"):
+        return value
+
+    lines = value.splitlines()
+
+    if lines and lines[0].strip().startswith("```"):
+        lines = lines[1:]
+
+    if lines and lines[-1].strip() == "```":
+        lines = lines[:-1]
+
+    return "\n".join(lines).strip()
+
+
+def normalize_local_gemma_answer(category, answer):
+    value = answer.strip()
+
+    if category == "sentiment":
+        match = re.search(
+            r"\b(positive|negative|neutral)\b",
+            value,
+            flags=re.IGNORECASE,
+        )
+
+        return match.group(1).lower() if match else ""
+
+    if category == "code_generation":
+        return strip_code_fence(value)
+
+    if category == "ner":
+        value = value.replace("**", "")
+        value = re.sub(
+            r"(?m)^\s*[-*]\s*",
+            "",
+            value,
+        )
+
+    return value.strip()
+
+
+def validate_local_gemma_answer(
+    task,
+    category,
+    answer,
+):
+    if not answer:
+        return False
+
+    lowered = answer.lower()
+
+    if any(
+        phrase in lowered
+        for phrase in (
+            "i don't know",
+            "i do not know",
+            "cannot answer",
+            "unable to answer",
+        )
+    ):
+        return False
+
+    if category == "sentiment":
+        return answer in (
+            "positive",
+            "negative",
+            "neutral",
+        )
+
+    if category == "factual":
+        return len(answer) <= 300
+
+    if category == "summarization":
+        return 5 <= len(answer) <= 1500
+
+    if category == "ner":
+        return len(answer) <= 1000
+
+    if category == "code_generation":
+        prompt = task_text(task).lower()
+
+        if "python" in prompt:
+            try:
+                compile(
+                    answer,
+                    "<local-gemma>",
+                    "exec",
+                )
+            except SyntaxError:
+                return False
+
+        return any(
+            token in answer
+            for token in (
+                "def ",
+                "class ",
+                "function ",
+                "const ",
+                "let ",
+                "public ",
+            )
+        )
+
+    return False
+
+
+def try_local_gemma(task):
+    category = local_task_category(task)
+
+    allowed_categories = {
+        "sentiment",
+        "summarization",
+        "ner",
+        "code_generation",
+    }
+
+    if category not in allowed_categories:
+        return None
+
+    model = os.getenv(
+        "ROUTEIQ_LOCAL_GEMMA_MODEL",
+        "/models/gemma-3-1b-it-Q4_K_M.gguf",
+    ).strip()
+
+    if not model or not Path(model).is_file():
+        log(
+            f"Local Gemma unavailable for "
+            f"task {task['task_id']}"
+        )
+        return None
+
+    original_prompt = task_text(task)
+    flattened_prompt = original_prompt.replace(
+        "\n",
+        "\\n",
+    )
+
+    prompt = (
+        f"{local_gemma_instruction(category)} "
+        f"Task: {flattened_prompt}"
+    )
+
+    command = [
+        "/usr/local/bin/llama-cli",
+        "-m",
+        model,
+        "-p",
+        prompt,
+        "-n",
+        str(local_gemma_budget(category)),
+        "-t",
+        os.getenv(
+            "ROUTEIQ_LOCAL_GEMMA_THREADS",
+            "2",
+        ),
+        "-c",
+        os.getenv(
+            "ROUTEIQ_LOCAL_GEMMA_CONTEXT",
+            "1024",
+        ),
+        "--temp",
+        "0",
+        "--single-turn",
+        "--no-display-prompt",
+    ]
+
+    started = time.monotonic()
+
+    try:
+        process = subprocess.run(
+            command,
+            stdin=subprocess.DEVNULL,
+            text=True,
+            capture_output=True,
+            timeout=60,
+            check=False,
+        )
+    except Exception as error:
+        log(
+            f"Local Gemma failed for "
+            f"task {task['task_id']}: {error}"
+        )
+        return None
+
+    elapsed = time.monotonic() - started
+    combined = process.stdout + "\n" + process.stderr
+
+    answer = extract_local_gemma_answer(
+        combined
+    )
+
+    answer = normalize_local_gemma_answer(
+        category,
+        answer,
+    )
+
+    if process.returncode != 0:
+        log(
+            f"Local Gemma exited with "
+            f"{process.returncode} for "
+            f"task {task['task_id']}"
+        )
+        return None
+
+    if not validate_local_gemma_answer(
+        task,
+        category,
+        answer,
+    ):
+        log(
+            f"Local Gemma validation rejected "
+            f"task {task['task_id']}"
+        )
+        return None
+
+    log(
+        f"Task {task['task_id']} solved by "
+        f"local Gemma category={category} "
+        f"in {elapsed:.2f}s"
+    )
+
+    return answer
+
+
+def fireworks_token_budget(task):
+    category = local_task_category(task)
+
+    budgets = {
+        "factual": 64,
+        "code_debugging": 256,
+        "sentiment": 32,
+        "math": 128,
+        "logic": 128,
+        "ner": 128,
+        "summarization": 192,
+        "code_generation": 256,
+    }
+
+    return budgets.get(category, 128)
+
+
 def model_id_candidates(model, url):
     """
     Use the evaluator-provided model ID exactly as supplied.
@@ -454,7 +921,7 @@ def request_fireworks(task, request_model, api_key, url):
             },
         ],
         "temperature": 0,
-        "max_tokens": 768,
+        "max_tokens": fireworks_token_budget(task),
         "stream": False,
     }
 
@@ -486,6 +953,30 @@ def request_fireworks(task, request_model, api_key, url):
 
             if not isinstance(content, str) or not content.strip():
                 raise RuntimeError("Response contains no answer text")
+
+            usage = body.get("usage") or {}
+
+            prompt_tokens = usage.get(
+                "prompt_tokens",
+                0,
+            )
+
+            completion_tokens = usage.get(
+                "completion_tokens",
+                0,
+            )
+
+            total_tokens = usage.get(
+                "total_tokens",
+                0,
+            )
+
+            log(
+                f"Fireworks usage task={task['task_id']} "
+                f"prompt={prompt_tokens} "
+                f"completion={completion_tokens} "
+                f"total={total_tokens}"
+            )
 
             return content.strip()
 
@@ -648,16 +1139,21 @@ def main():
             if answer is not None:
                 local_count += 1
                 log(
-                    f"Task {task['task_id']} solved locally "
-                    f"with zero Fireworks tokens"
+                    f"Task {task['task_id']} solved by "
+                    f"deterministic local handler"
                 )
             else:
-                answer = call_fireworks_with_fallback(
-                    task,
-                    models,
-                    api_key,
-                    url,
-                )
+                answer = try_local_gemma(task)
+
+                if answer is not None:
+                    local_count += 1
+                else:
+                    answer = call_fireworks_with_fallback(
+                        task,
+                        models,
+                        api_key,
+                        url,
+                    )
         except Exception as error:
             log(f"Task {task['task_id']} failed: {error}")
             answer = ""

@@ -1,0 +1,5 @@
+Gemma is provided under and subject to the Gemma Terms of Use:
+https://ai.google.dev/gemma/terms
+
+This container includes Gemma 3 1B IT in GGUF Q4_K_M format.
+Gemma remains subject to Google's Gemma Terms of Use and Prohibited Use Policy.

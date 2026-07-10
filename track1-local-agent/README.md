@@ -1,11 +1,12 @@
-# OmniEdge RouteIQ — Local-First Canary
+# OmniEdge RouteIQ — Local Gemma Hybrid
 
-Experimental Track 1 scoring agent.
+Track 1 scoring architecture:
 
-Execution order:
+1. General deterministic local handlers for high-confidence tasks
+2. Gemma 3 1B IT Q4_K_M inference inside the container
+3. Official evaluator-provided Fireworks fallback for unresolved tasks
 
-1. Deterministic local handlers
-2. Local Gemma inference
-3. Evaluator-provided Fireworks fallback
+No external inference provider is used. Fireworks requests use only the
+runtime-provided FIREWORKS_BASE_URL, FIREWORKS_API_KEY, and ALLOWED_MODELS.
 
-The qualified v0.4 scoring image remains untouched.
+The previously qualified v0.4 image remains available as a rollback image.
