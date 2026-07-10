@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.pyo
+*.backup
+*.stage*-backup
+agent.py.v0.4-base
+agent.py.stage*
+.git/
+.github/
