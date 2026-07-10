@@ -1,7 +1,13 @@
-name: Publish Track 1 Conservative v0.8
+name: Publish Track 1 Token-Capped v0.8.1
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - track1-final-conservative-v08
+    paths:
+      - "track1-final-agent/**"
+      - ".github/workflows/publish-track1-final-v081.yml"
 
 permissions:
   contents: read
@@ -34,4 +40,4 @@ jobs:
           push: true
           provenance: false
           sbom: false
-          tags: ghcr.io/kaulastudies/omniedge-routeiq-track1:v0.8-conservative
+          tags: ghcr.io/kaulastudies/omniedge-routeiq-track1:v0.8.1-token-capped

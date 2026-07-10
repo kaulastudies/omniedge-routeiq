@@ -181,13 +181,38 @@ def model_id_candidates(model, url):
     return candidates
 
 
+
+def token_budget(route):
+    """
+    Return a conservative generation limit for each task category.
+
+    These limits reduce Fireworks usage while preserving enough room for
+    complete answers in the supported evaluator categories.
+    """
+    normalized = str(route or "general").lower()
+
+    budgets = {
+        "sentiment": 24,
+        "math": 48,
+        "logic": 64,
+        "factual": 96,
+        "general": 96,
+        "ner": 128,
+        "summarization": 160,
+        "code": 384,
+    }
+
+    return budgets.get(normalized, 96)
+
+
 def request_fireworks(task, request_model, api_key, url):
     category = str(
-        task.get("task_type")
+        task.get("_routeiq_route")
+        or task.get("task_type")
         or task.get("category")
         or task.get("type")
         or "general"
-    )
+    ).lower()
 
     payload = {
         "model": request_model,
@@ -195,10 +220,8 @@ def request_fireworks(task, request_model, api_key, url):
             {
                 "role": "system",
                 "content": (
-                    "Complete the task accurately and concisely. "
-                    "Follow every requested format or length constraint. "
-                    "Return only the requested answer. "
-                    f"Task category: {category}."
+                    "Answer accurately. Return only the requested "
+                    f"output in its required format. Route: {category}."
                 ),
             },
             {
@@ -207,7 +230,7 @@ def request_fireworks(task, request_model, api_key, url):
             },
         ],
         "temperature": 0,
-        "max_tokens": 768,
+        "max_tokens": token_budget(category),
         "stream": False,
     }
 
@@ -722,6 +745,7 @@ def call_routed_fireworks(
     """
     last_error = None
     routed_task = dict(task)
+    routed_task["_routeiq_route"] = route
 
     if not routed_task.get("task_type"):
         routed_task["task_type"] = route
