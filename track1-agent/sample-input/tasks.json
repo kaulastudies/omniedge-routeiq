@@ -1,0 +1,17 @@
+[
+  {
+    "task_id": "fact-001",
+    "task_type": "factual knowledge",
+    "prompt": "What is the capital of Japan?"
+  },
+  {
+    "task_id": "math-001",
+    "task_type": "mathematical reasoning",
+    "prompt": "Calculate 18 * 7. Return only the number."
+  },
+  {
+    "task_id": "sentiment-001",
+    "task_type": "sentiment classification",
+    "prompt": "Classify as positive, negative, or neutral: The deployment completed successfully."
+  }
+]
