@@ -38,7 +38,7 @@ jobs:
           file: ./track1-agent/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/kaulastudies/omniedge-routeiq-track1:v0.2-runtimefix
+          tags: ghcr.io/kaulastudies/omniedge-routeiq-track1:v0.3-model-id-fix
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.description=OmniEdge RouteIQ AMD ACT II Track 1 scoring agent

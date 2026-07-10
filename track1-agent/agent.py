@@ -118,6 +118,20 @@ def task_text(task):
     return json.dumps(safe_task, ensure_ascii=False)
 
 
+def canonical_model_id(model):
+    """Convert an allowed short model name to Fireworks' canonical ID."""
+    value = str(model).strip()
+
+    if not value:
+        raise ValueError("Selected model is empty")
+
+    # Preserve already-qualified model identifiers.
+    if value.startswith("accounts/") or "/" in value:
+        return value
+
+    return f"accounts/fireworks/models/{value}"
+
+
 def call_fireworks(task, model, api_key, url):
     category = str(
         task.get("task_type")
@@ -127,7 +141,7 @@ def call_fireworks(task, model, api_key, url):
     )
 
     payload = {
-        "model": model,
+        "model": canonical_model_id(model),
         "messages": [
             {
                 "role": "system",
