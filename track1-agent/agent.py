@@ -71,7 +71,8 @@ def choose_model(models):
     if not models:
         raise ValueError("ALLOWED_MODELS contains no usable models")
 
-    for keyword in ("gemma", "kimi", "minimax"):
+    # MiniMax is currently our verified evaluator-safe primary model.
+    for keyword in ("minimax", "gemma", "kimi"):
         for model in models:
             if keyword in model.lower():
                 return model
@@ -118,21 +119,31 @@ def task_text(task):
     return json.dumps(safe_task, ensure_ascii=False)
 
 
-def canonical_model_id(model):
-    """Convert an allowed short model name to Fireworks' canonical ID."""
+def model_id_candidates(model, url):
+    """
+    Use the evaluator-provided model ID exactly as supplied.
+
+    The public Fireworks endpoint requires canonical IDs, so canonical
+    fallback is attempted only during direct api.fireworks.ai testing.
+    """
     value = str(model).strip()
 
     if not value:
         raise ValueError("Selected model is empty")
 
-    # Preserve already-qualified model identifiers.
-    if value.startswith("accounts/") or "/" in value:
-        return value
+    candidates = [value]
 
-    return f"accounts/fireworks/models/{value}"
+    if (
+        "api.fireworks.ai" in url.lower()
+        and not value.startswith("accounts/")
+        and "/" not in value
+    ):
+        candidates.append(f"accounts/fireworks/models/{value}")
+
+    return candidates
 
 
-def call_fireworks(task, model, api_key, url):
+def request_fireworks(task, request_model, api_key, url):
     category = str(
         task.get("task_type")
         or task.get("category")
@@ -141,12 +152,13 @@ def call_fireworks(task, model, api_key, url):
     )
 
     payload = {
-        "model": canonical_model_id(model),
+        "model": request_model,
         "messages": [
             {
                 "role": "system",
                 "content": (
                     "Complete the task accurately and concisely. "
+                    "Follow every requested format or length constraint. "
                     "Return only the requested answer. "
                     f"Task category: {category}."
                 ),
@@ -157,24 +169,24 @@ def call_fireworks(task, model, api_key, url):
             },
         ],
         "temperature": 0,
-        "max_tokens": 512,
+        "max_tokens": 768,
         "stream": False,
     }
-
-    request = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        method="POST",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-    )
 
     last_error = None
 
     for attempt in range(2):
+        request = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
         try:
             with urllib.request.urlopen(request, timeout=90) as response:
                 body = json.loads(response.read().decode("utf-8"))
@@ -187,16 +199,23 @@ def call_fireworks(task, model, api_key, url):
             message = choices[0].get("message", {})
             content = message.get("content")
 
-            if not isinstance(content, str):
+            if not isinstance(content, str) or not content.strip():
                 raise RuntimeError("Response contains no answer text")
 
             return content.strip()
 
         except urllib.error.HTTPError as error:
-            details = error.read().decode("utf-8", errors="replace")
-            last_error = RuntimeError(
-                f"Fireworks HTTP {error.code}: {details[:400]}"
+            details = error.read().decode(
+                "utf-8",
+                errors="replace",
             )
+
+            last_error = RuntimeError(
+                f"Fireworks HTTP {error.code}: {details[:500]}"
+            )
+
+            if error.code not in (429, 500, 502, 503, 504):
+                break
 
         except Exception as error:
             last_error = error
@@ -204,7 +223,74 @@ def call_fireworks(task, model, api_key, url):
         if attempt == 0:
             time.sleep(2)
 
-    raise RuntimeError(str(last_error))
+    raise last_error or RuntimeError("Fireworks request failed")
+
+
+def call_fireworks(task, model, api_key, url):
+    last_error = None
+
+    for request_model in model_id_candidates(model, url):
+        try:
+            log(f"Trying Fireworks model ID: {request_model}")
+            return request_fireworks(
+                task,
+                request_model,
+                api_key,
+                url,
+            )
+        except Exception as error:
+            last_error = error
+            log(
+                f"Model ID {request_model} failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    raise last_error or RuntimeError("All model-ID forms failed")
+
+
+def ordered_models(models):
+    ordered = []
+
+    for keyword in ("minimax", "gemma", "kimi"):
+        for model in models:
+            if keyword in model.lower() and model not in ordered:
+                ordered.append(model)
+
+    for model in models:
+        if model not in ordered:
+            ordered.append(model)
+
+    return ordered
+
+
+def call_fireworks_with_fallback(
+    task,
+    models,
+    api_key,
+    url,
+):
+    last_error = None
+
+    for model in ordered_models(models):
+        try:
+            log(f"Attempting allowed model: {model}")
+            return call_fireworks(
+                task,
+                model,
+                api_key,
+                url,
+            )
+        except Exception as error:
+            last_error = error
+            log(
+                f"Allowed model {model} failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    raise last_error or RuntimeError(
+        "All allowed Fireworks models failed"
+    )
+
 
 
 def write_results(results):
@@ -252,7 +338,8 @@ def main():
         return 1
 
     try:
-        model = choose_model(parse_allowed_models())
+        models = parse_allowed_models()
+        model = choose_model(models)
         url = completion_url()
     except Exception as error:
         log(f"Configuration error: {error}")
@@ -270,7 +357,7 @@ def main():
 
     for task in tasks:
         try:
-            answer = call_fireworks(task, model, api_key, url)
+            answer = call_fireworks_with_fallback(task, models, api_key, url)
         except Exception as error:
             log(f"Task {task['task_id']} failed: {error}")
             answer = ""
