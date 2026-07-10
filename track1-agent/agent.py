@@ -119,6 +119,174 @@ def task_text(task):
     return json.dumps(safe_task, ensure_ascii=False)
 
 
+def task_category(task):
+    raw = str(
+        task.get("task_type")
+        or task.get("category")
+        or task.get("type")
+        or ""
+    ).strip().lower()
+
+    normalized = (
+        raw.replace("-", "_")
+        .replace(" ", "_")
+        .replace("/", "_")
+    )
+
+    metadata_aliases = (
+        ("code_debugging", ("code_debug", "debugging", "bug_fix", "fix_code")),
+        ("code_generation", ("code_generation", "generate_code", "programming")),
+        ("sentiment", ("sentiment",)),
+        ("summarization", ("summar",)),
+        ("ner", ("named_entity", "entity_extraction", "ner")),
+        ("math", ("math", "arithmetic", "calculation")),
+        ("logic", ("logic", "deductive", "deduction")),
+        ("factual", ("factual", "knowledge", "question_answering")),
+    )
+
+    for category, aliases in metadata_aliases:
+        if any(alias in normalized for alias in aliases):
+            return category
+
+    prompt = task_text(task).lower()
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "debug this",
+            "fix this code",
+            "fix the code",
+            "find the bug",
+            "correct the code",
+        )
+    ):
+        return "code_debugging"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "write a function",
+            "write a program",
+            "generate code",
+            "implement a function",
+            "create a function",
+        )
+    ):
+        return "code_generation"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "sentiment",
+            "positive, negative",
+            "positive or negative",
+        )
+    ):
+        return "sentiment"
+
+    if "summarize" in prompt or "summary" in prompt:
+        return "summarization"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "named entities",
+            "extract entities",
+            "person and organization",
+            "ner",
+        )
+    ):
+        return "ner"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "calculate",
+            "compute",
+            "multiply",
+            "divided by",
+            "solve the equation",
+            "arithmetic",
+        )
+    ):
+        return "math"
+
+    if any(
+        phrase in prompt
+        for phrase in (
+            "deduce",
+            "logically",
+            "syllogism",
+            "can we conclude",
+            "which conclusion",
+        )
+    ):
+        return "logic"
+
+    return "factual"
+
+
+def token_budget(task):
+    category = task_category(task)
+
+    budgets = {
+        "sentiment": 48,
+        "ner": 160,
+        "factual": 160,
+        "math": 256,
+        "logic": 256,
+        "summarization": 320,
+        "code_debugging": 512,
+        "code_generation": 640,
+    }
+
+    return budgets.get(category, 256)
+
+
+def system_prompt(task):
+    category = task_category(task)
+
+    prompts = {
+        "factual": (
+            "Answer accurately and directly. "
+            "Return only the requested answer."
+        ),
+        "math": (
+            "Solve carefully and verify the arithmetic. "
+            "Return only the final requested answer."
+        ),
+        "sentiment": (
+            "Classify the sentiment accurately. "
+            "Return only the requested label."
+        ),
+        "summarization": (
+            "Summarize faithfully and obey all requested "
+            "length and formatting constraints."
+        ),
+        "ner": (
+            "Extract only the requested named entities. "
+            "Preserve spelling and follow the requested format."
+        ),
+        "code_debugging": (
+            "Correct the bug accurately. Return only the "
+            "requested corrected code or final answer."
+        ),
+        "logic": (
+            "Evaluate the logic carefully. Return only the "
+            "final conclusion or requested option."
+        ),
+        "code_generation": (
+            "Generate correct executable code matching every "
+            "constraint. Return only code unless asked otherwise."
+        ),
+    }
+
+    return prompts.get(
+        category,
+        "Complete the task accurately and return only the requested result.",
+    )
+
+
 def model_id_candidates(model, url):
     """
     Use the evaluator-provided model ID exactly as supplied.
@@ -143,25 +311,18 @@ def model_id_candidates(model, url):
     return candidates
 
 
-def request_fireworks(task, request_model, api_key, url):
-    category = str(
-        task.get("task_type")
-        or task.get("category")
-        or task.get("type")
-        or "general"
-    )
-
+def request_fireworks(
+    task,
+    request_model,
+    api_key,
+    url,
+):
     payload = {
         "model": request_model,
         "messages": [
             {
                 "role": "system",
-                "content": (
-                    "Complete the task accurately and concisely. "
-                    "Follow every requested format or length constraint. "
-                    "Return only the requested answer. "
-                    f"Task category: {category}."
-                ),
+                "content": system_prompt(task),
             },
             {
                 "role": "user",
@@ -169,7 +330,7 @@ def request_fireworks(task, request_model, api_key, url):
             },
         ],
         "temperature": 0,
-        "max_tokens": 768,
+        "max_tokens": token_budget(task),
         "stream": False,
     }
 
@@ -188,21 +349,37 @@ def request_fireworks(task, request_model, api_key, url):
         )
 
         try:
-            with urllib.request.urlopen(request, timeout=90) as response:
-                body = json.loads(response.read().decode("utf-8"))
+            with urllib.request.urlopen(
+                request,
+                timeout=90,
+            ) as response:
+                body = json.loads(
+                    response.read().decode("utf-8")
+                )
 
             choices = body.get("choices", [])
 
             if not choices:
-                raise RuntimeError("Response contains no choices")
+                raise RuntimeError(
+                    "Response contains no choices"
+                )
 
             message = choices[0].get("message", {})
             content = message.get("content")
 
-            if not isinstance(content, str) or not content.strip():
-                raise RuntimeError("Response contains no answer text")
+            if not isinstance(content, str):
+                raise RuntimeError(
+                    "Response contains no answer text"
+                )
 
-            return content.strip()
+            answer = content.strip()
+
+            if not answer:
+                raise RuntimeError(
+                    "Response answer is empty"
+                )
+
+            return answer
 
         except urllib.error.HTTPError as error:
             details = error.read().decode(
@@ -211,10 +388,17 @@ def request_fireworks(task, request_model, api_key, url):
             )
 
             last_error = RuntimeError(
-                f"Fireworks HTTP {error.code}: {details[:500]}"
+                f"Fireworks HTTP {error.code}: "
+                f"{details[:500]}"
             )
 
-            if error.code not in (429, 500, 502, 503, 504):
+            if error.code not in (
+                429,
+                500,
+                502,
+                503,
+                504,
+            ):
                 break
 
         except Exception as error:
@@ -223,7 +407,9 @@ def request_fireworks(task, request_model, api_key, url):
         if attempt == 0:
             time.sleep(2)
 
-    raise last_error or RuntimeError("Fireworks request failed")
+    raise last_error or RuntimeError(
+        "Fireworks request failed"
+    )
 
 
 def call_fireworks(task, model, api_key, url):
@@ -248,12 +434,64 @@ def call_fireworks(task, model, api_key, url):
     raise last_error or RuntimeError("All model-ID forms failed")
 
 
-def ordered_models(models):
+def ordered_models(models, task):
+    category = task_category(task)
+
+    if category in (
+        "code_debugging",
+        "code_generation",
+    ):
+        preferences = (
+            "kimi-k2p7-code",
+            "kimi",
+            "minimax-m3",
+            "minimax",
+            "gemma-4-31b-it",
+            "gemma",
+        )
+
+    elif category in ("math", "logic"):
+        preferences = (
+            "minimax-m3",
+            "minimax",
+            "gemma-4-31b-it",
+            "gemma-4-31b-it-nvfp4",
+            "gemma",
+            "kimi",
+        )
+
+    else:
+        preferences = (
+            "gemma-4-31b-it",
+            "gemma-4-31b-it-nvfp4",
+            "gemma-4-26b-a4b-it",
+            "gemma",
+            "minimax-m3",
+            "minimax",
+            "kimi",
+        )
+
     ordered = []
 
-    for keyword in ("minimax", "gemma", "kimi"):
+    for preference in preferences:
         for model in models:
-            if keyword in model.lower() and model not in ordered:
+            basename = (
+                str(model)
+                .strip()
+                .rsplit("/", 1)[-1]
+                .lower()
+            )
+
+            if preference in (
+                "gemma",
+                "minimax",
+                "kimi",
+            ):
+                matched = preference in basename
+            else:
+                matched = basename == preference
+
+            if matched and model not in ordered:
                 ordered.append(model)
 
     for model in models:
@@ -270,18 +508,29 @@ def call_fireworks_with_fallback(
     url,
 ):
     last_error = None
+    category = task_category(task)
+    budget = token_budget(task)
 
-    for model in ordered_models(models):
+    log(
+        f"Task {task['task_id']}: "
+        f"category={category}, "
+        f"max_tokens={budget}"
+    )
+
+    for model in ordered_models(models, task):
         try:
             log(f"Attempting allowed model: {model}")
+
             return call_fireworks(
                 task,
                 model,
                 api_key,
                 url,
             )
+
         except Exception as error:
             last_error = error
+
             log(
                 f"Allowed model {model} failed: "
                 f"{type(error).__name__}: {error}"
@@ -290,7 +539,6 @@ def call_fireworks_with_fallback(
     raise last_error or RuntimeError(
         "All allowed Fireworks models failed"
     )
-
 
 
 def write_results(results):
@@ -351,7 +599,7 @@ def main():
         )
         return 1
 
-    log(f"Selected allowed model: {model}")
+    log(f"Loaded {len(models)} allowed models; default={model}")
 
     results = []
 
