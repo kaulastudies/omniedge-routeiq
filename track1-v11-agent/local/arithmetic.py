@@ -339,28 +339,45 @@ def _solve_single_percentage_change(
 def _solve_direct_expression(
     text: str,
 ) -> LocalDecision | None:
+    cleaned_text = re.sub(
+        r"\s*[.?!]?\s*"
+        r"(?:return|respond with|answer with|give)"
+        r"\s+only\s+"
+        r"(?:the\s+)?"
+        r"(?:number|numeric answer)"
+        r"\s*[.?!]?\s*$",
+        "",
+        text,
+        flags=re.IGNORECASE,
+    ).strip()
+
     command_match = re.fullmatch(
         r"(?:please )?"
         r"(?:what is|calculate|compute|evaluate|solve)"
-        r"\s+([0-9.\s()+\-*/%]+)\??",
-        text,
+        r"\s+([-0-9.\s()+*/%]+)\??",
+        cleaned_text,
     )
 
     if command_match:
         expression = command_match.group(1).strip()
+
     elif re.fullmatch(
-        r"[0-9.\s()+\-*/%]+",
-        text,
+        r"[-0-9.\s()+*/%]+",
+        cleaned_text,
     ):
-        expression = text
+        expression = cleaned_text
+
     else:
         return None
 
     if not re.search(r"\d", expression):
-        return _reject("expression contains no number")
+        return _reject(
+            "expression contains no number"
+        )
 
     try:
         value = _safe_evaluate(expression)
+
     except (
         SyntaxError,
         TypeError,

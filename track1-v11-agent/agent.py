@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from local.arithmetic import solve_arithmetic
+from local.sentiment import solve_sentiment
 
 
 INPUT_PATH = Path(
@@ -726,22 +727,49 @@ def resolve_local_tasks(
             )
             continue
 
-        decision = solve_arithmetic(task_text)
+        arithmetic_decision = solve_arithmetic(
+            task_text
+        )
 
-        if decision.accepted and decision.answer:
-            answers[task_id] = decision.answer
+        if (
+            arithmetic_decision.accepted
+            and arithmetic_decision.answer
+        ):
+            answers[task_id] = (
+                arithmetic_decision.answer
+            )
 
             log(
-                f"Local accept {task_id}: "
-                f"{decision.reason}"
+                f"Local arithmetic accept {task_id}: "
+                f"{arithmetic_decision.reason}"
             )
-        else:
-            unresolved.append(task)
+
+            continue
+
+        sentiment_decision = solve_sentiment(task)
+
+        if (
+            sentiment_decision.accepted
+            and sentiment_decision.answer
+        ):
+            answers[task_id] = (
+                sentiment_decision.answer
+            )
 
             log(
-                f"Local reject {task_id}: "
-                f"{decision.reason}"
+                f"Local sentiment accept {task_id}: "
+                f"{sentiment_decision.reason}"
             )
+
+            continue
+
+        unresolved.append(task)
+
+        log(
+            f"Local reject {task_id}: "
+            f"arithmetic={arithmetic_decision.reason}; "
+            f"sentiment={sentiment_decision.reason}"
+        )
 
     return answers, unresolved
 

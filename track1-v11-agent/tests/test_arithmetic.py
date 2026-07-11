@@ -17,6 +17,14 @@ class DirectArithmeticTests(unittest.TestCase):
             "Compute 29 % 6": "5",
             "₹2,400 + ₹600": "3000",
             "7 / 2": "3.5",
+            (
+                "Calculate 18 * 7. "
+                "Return only the number."
+            ): "126",
+            (
+                "Compute 25 + 17. "
+                "Answer with only the numeric answer."
+            ): "42",
         }
 
         for text, expected in cases.items():
@@ -165,6 +173,10 @@ class RejectionTests(unittest.TestCase):
             "Discount 500 by 120%.",
             "__import__('os').system('echo unsafe')",
             "Some features are good, but others are terrible.",
+            (
+                "Calculate 18 * 7. "
+                "Return only the number and explain why."
+            ),
         ]
 
         for text in rejected:
