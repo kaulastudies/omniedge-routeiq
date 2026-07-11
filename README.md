@@ -25,6 +25,34 @@
 
 ---
 
+## Track 1 Benchmark Result
+
+Best completed evaluator result observed for the protected v1.2 image:
+
+| Metric | Result |
+|---|---:|
+| Accuracy | **94.7%** |
+| Fireworks tokens | **3,974** |
+| Previous qualified baseline | 12,531 tokens |
+| Token reduction | **68.3%** |
+
+Evaluated image:
+
+```text
+ghcr.io/kaulastudies/omniedge-routeiq-track1:v1.2-local-core
+```
+
+Execution path:
+
+```text
+Deterministic solvers
+→ Qwen3 1.7B local inference
+→ Fireworks fallback
+→ /output/results.json
+```
+
+The portal later displayed an infrastructure error during a recheck. These figures record the completed evaluation observed before that recheck.
+
 ## Overview
 
 **OmniEdge RouteIQ** is an enterprise-grade AI routing layer built for the AMD ACT II Hackathon.
