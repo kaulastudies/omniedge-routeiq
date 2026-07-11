@@ -793,27 +793,77 @@ def main() -> int:
 
     if unresolved:
         try:
-            log(
-                f"Attempting one local Qwen batch "
-                f"for {len(unresolved)} tasks"
+            qwen_batch_size = int(
+                os.getenv(
+                    "QWEN_BATCH_SIZE",
+                    "4",
+                )
             )
+        except ValueError:
+            qwen_batch_size = 4
 
-            qwen_answers = call_qwen_batch(
-                unresolved
-            )
+        qwen_batch_size = max(
+            1,
+            min(qwen_batch_size, 8),
+        )
 
-            answers.update(qwen_answers)
+        total_batches = (
+            len(unresolved)
+            + qwen_batch_size
+            - 1
+        ) // qwen_batch_size
 
-            log(
-                f"Qwen accepted "
-                f"{len(qwen_answers)} answers"
-            )
+        log(
+            f"Attempting {total_batches} guarded "
+            f"Qwen batches for {len(unresolved)} tasks; "
+            f"batch_size={qwen_batch_size}"
+        )
 
-        except Exception as error:
-            log(
-                f"Local Qwen batch failed: "
-                f"{type(error).__name__}: {error}"
-            )
+        for offset in range(
+            0,
+            len(unresolved),
+            qwen_batch_size,
+        ):
+            batch = unresolved[
+                offset : offset + qwen_batch_size
+            ]
+
+            batch_number = (
+                offset // qwen_batch_size
+            ) + 1
+
+            try:
+                batch_answers = call_qwen_batch(
+                    batch
+                )
+
+                qwen_answers.update(
+                    batch_answers
+                )
+
+                answers.update(
+                    batch_answers
+                )
+
+                log(
+                    f"Qwen batch {batch_number}/"
+                    f"{total_batches} accepted "
+                    f"{len(batch_answers)}/"
+                    f"{len(batch)} answers"
+                )
+
+            except Exception as error:
+                log(
+                    f"Qwen batch {batch_number}/"
+                    f"{total_batches} failed: "
+                    f"{type(error).__name__}: {error}"
+                )
+
+        log(
+            f"Qwen accepted "
+            f"{len(qwen_answers)}/"
+            f"{len(unresolved)} unresolved tasks"
+        )
 
     remote_candidates = [
         task
