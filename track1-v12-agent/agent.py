@@ -10,6 +10,7 @@ from typing import Any
 
 from local.arithmetic import solve_arithmetic
 from local.sentiment import solve_sentiment
+from local.qwen import call_qwen_batch
 
 
 INPUT_PATH = Path(
@@ -788,14 +789,49 @@ def main() -> int:
     )
 
     answers = dict(local_answers)
+    qwen_answers: dict[str, str] = {}
+
+    if unresolved:
+        try:
+            log(
+                f"Attempting one local Qwen batch "
+                f"for {len(unresolved)} tasks"
+            )
+
+            qwen_answers = call_qwen_batch(
+                unresolved
+            )
+
+            answers.update(qwen_answers)
+
+            log(
+                f"Qwen accepted "
+                f"{len(qwen_answers)} answers"
+            )
+
+        except Exception as error:
+            log(
+                f"Local Qwen batch failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    remote_candidates = [
+        task
+        for task in unresolved
+        if not answers.get(
+            str(task["task_id"]),
+            "",
+        ).strip()
+    ]
 
     log(
         f"Routing summary: "
-        f"local={len(local_answers)}; "
-        f"remote={len(unresolved)}"
+        f"deterministic={len(local_answers)}; "
+        f"qwen={len(qwen_answers)}; "
+        f"remote={len(remote_candidates)}"
     )
 
-    if unresolved:
+    if remote_candidates:
         try:
             models = parse_allowed_models()
             url = completion_url()
@@ -811,7 +847,9 @@ def main() -> int:
                 )
 
         except Exception as error:
-            log(f"Remote configuration error: {error}")
+            log(
+                f"Remote configuration error: {error}"
+            )
 
             results = [
                 {
@@ -829,7 +867,7 @@ def main() -> int:
 
         try:
             remote_answers = call_batch(
-                unresolved,
+                remote_candidates,
                 models,
                 api_key,
                 url,
@@ -845,7 +883,7 @@ def main() -> int:
 
         missing = [
             task
-            for task in unresolved
+            for task in remote_candidates
             if not answers.get(
                 str(task["task_id"]),
                 "",
@@ -890,8 +928,9 @@ def main() -> int:
         f"Wrote {len(results)} results; "
         f"completed={completed}; "
         f"missing={len(results) - completed}; "
-        f"local={len(local_answers)}; "
-        f"remote={len(unresolved)}"
+        f"deterministic={len(local_answers)}; "
+        f"qwen={len(qwen_answers)}; "
+        f"remote={len(remote_candidates)}"
     )
 
     return 0
