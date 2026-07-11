@@ -1,0 +1,7 @@
+FROM routeiq-v14-ultra-local:base
+ENV QWEN_MODE=thinking \
+    QWEN_SEED=42 \
+    QWEN_TIMEOUT_SECONDS=360
+COPY agent.py /app/agent.py
+COPY local /app/local
+ENTRYPOINT ["python3", "/app/agent.py"]
