@@ -1,0 +1,30 @@
+Local reject X01: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X01b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X01c: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept X02: ordered inventory word-problem pattern
+Local reject X02b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept X03: ordered inventory word-problem pattern
+Local arithmetic accept X04: exact chained discount-tax pattern
+Local reject X05: arithmetic=no provably safe arithmetic pattern matched; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X05b: arithmetic=no provably safe arithmetic pattern matched; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X05c: arithmetic=task belongs to another category; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local summary accept X06: extractive constraint-aware sentence summary
+Local summary accept X06b: extractive constraint-aware bullet summary
+Local reject X07: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=NER pattern lacked a complete high-confidence entity set; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local ner accept X07b: high-confidence contextual NER pattern
+Local reject X08: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=no supported high-confidence code pattern; summary=task is not recognizably summarization
+Local reject X09: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=assignment puzzle could not be parsed confidently; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X10: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=no supported high-confidence code pattern; summary=task is not recognizably summarization
+Local reject X11: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X12: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=assignment puzzle could not be parsed confidently; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Attempting local Qwen proposal batch for 13 tasks
+Running Qwen knowledge microbatch with 5 tasks
+Qwen knowledge microbatch failed: RuntimeError: Qwen local inference is disabled
+Running Qwen reasoning microbatch with 5 tasks
+Qwen reasoning microbatch failed: RuntimeError: Qwen local inference is disabled
+Running Qwen language microbatch with 3 tasks
+Qwen language microbatch failed: RuntimeError: Qwen local inference is disabled
+Qwen proposal accepted 0 of 0 recovered answers
+Routing summary: deterministic=6; qwen=0; remote=13
+Local-only benchmark: leaving 13 tasks unresolved
+Wrote 19 results; completed=6; missing=13; deterministic=6; qwen=0; remote_needed=13

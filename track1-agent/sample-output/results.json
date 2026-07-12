@@ -1,0 +1,14 @@
+[
+  {
+    "task_id": "fact-001",
+    "answer": "mock-answer-for-fact-001"
+  },
+  {
+    "task_id": "math-001",
+    "answer": "mock-answer-for-math-001"
+  },
+  {
+    "task_id": "sentiment-001",
+    "answer": "mock-answer-for-sentiment-001"
+  }
+]

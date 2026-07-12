@@ -1,0 +1,40 @@
+{
+  "version": "0.9.0-local-heavy",
+  "remote_primary": "minimax",
+  "remote_fallbacks_enabled": true,
+  "local_acceptance_default": "reject",
+  "categories": {
+    "arithmetic": {
+      "local_solver": true,
+      "validator": "independent_recompute"
+    },
+    "sentiment": {
+      "local_solver": true,
+      "validator": "signal_agreement"
+    },
+    "ner": {
+      "local_solver": true,
+      "validator": "source_span_schema"
+    },
+    "code": {
+      "local_solver": true,
+      "validator": "syntax_and_tests"
+    },
+    "logic": {
+      "local_solver": true,
+      "validator": "constraint_check"
+    },
+    "summarization": {
+      "local_solver": true,
+      "validator": "coverage_length_contradiction"
+    },
+    "factual": {
+      "local_solver": false,
+      "validator": "bundled_knowledge_only"
+    },
+    "general": {
+      "local_solver": false,
+      "validator": "remote"
+    }
+  }
+}

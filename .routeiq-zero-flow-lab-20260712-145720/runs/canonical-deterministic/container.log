@@ -1,0 +1,26 @@
+Local reject T01: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject T01b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject T01c: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept T02: ordered inventory word-problem pattern
+Local arithmetic accept T02b: exact recipe scaling and unit-cost pattern
+Local arithmetic accept M03: ordered inventory word-problem pattern
+Local arithmetic accept M04: exact chained discount-tax pattern
+Local sentiment accept T03: mixed sentiment with one-sentence balanced reason
+Local sentiment accept T03b: mixed sentiment with one-sentence balanced reason
+Local sentiment accept S03: mixed sentiment resolved with balanced label
+Local summary accept T04: extractive constraint-aware sentence summary
+Local summary accept T04b: extractive constraint-aware bullet summary
+Local ner accept T05: high-confidence contextual NER pattern
+Local ner accept N02: high-confidence contextual NER pattern
+Local code accept D01: high-confidence maximum-list implementation
+Local logic accept L01: uniquely solved assignment puzzle
+Local code accept C01: high-confidence second-distinct-largest implementation
+Local reject F04: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local logic accept L02: uniquely solved assignment puzzle
+Attempting local Qwen proposal batch for 4 tasks
+Running Qwen knowledge microbatch with 4 tasks
+Qwen knowledge microbatch failed: RuntimeError: Qwen local inference is disabled
+Qwen proposal accepted 0 of 0 recovered answers
+Routing summary: deterministic=15; qwen=0; remote=4
+Local-only benchmark: leaving 4 tasks unresolved
+Wrote 19 results; completed=15; missing=4; deterministic=15; qwen=0; remote_needed=4

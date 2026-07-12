@@ -1,0 +1,897 @@
+#!/usr/bin/env python3
+
+import json
+import ast
+import math
+import operator
+import re
+import os
+import sys
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+
+INPUT_PATH = Path(os.getenv("INPUT_PATH", "/input/tasks.json"))
+OUTPUT_PATH = Path(os.getenv("OUTPUT_PATH", "/output/results.json"))
+
+
+def log(message):
+    print(message, file=sys.stderr, flush=True)
+
+
+def load_tasks():
+    with INPUT_PATH.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+
+    if isinstance(data, list):
+        tasks = data
+    elif isinstance(data, dict) and isinstance(data.get("tasks"), list):
+        tasks = data["tasks"]
+    else:
+        raise ValueError(
+            "tasks.json must be a list or an object containing a tasks list"
+        )
+
+    for index, task in enumerate(tasks):
+        if not isinstance(task, dict):
+            raise ValueError(f"Task {index} is not an object")
+
+        if "task_id" not in task:
+            if "id" in task:
+                task["task_id"] = task["id"]
+            else:
+                raise ValueError(f"Task {index} has no task_id")
+
+    return tasks
+
+
+def parse_allowed_models():
+    raw = os.getenv("ALLOWED_MODELS", "").strip()
+
+    if not raw:
+        raise ValueError("ALLOWED_MODELS is missing")
+
+    try:
+        parsed = json.loads(raw)
+        if isinstance(parsed, list):
+            models = [str(model).strip() for model in parsed]
+            return [model for model in models if model]
+    except json.JSONDecodeError:
+        pass
+
+    raw = raw.replace(";", ",").replace("\n", ",")
+
+    if "," in raw:
+        models = raw.split(",")
+    else:
+        models = raw.split()
+
+    return [model.strip() for model in models if model.strip()]
+
+
+def choose_model(models):
+    if not models:
+        raise ValueError("ALLOWED_MODELS contains no usable models")
+
+    # MiniMax is currently our verified evaluator-safe primary model.
+    for keyword in ("minimax", "gemma", "kimi"):
+        for model in models:
+            if keyword in model.lower():
+                return model
+
+    return models[0]
+
+
+def completion_url():
+    base_url = os.getenv("FIREWORKS_BASE_URL", "").strip().rstrip("/")
+
+    if not base_url:
+        raise ValueError("FIREWORKS_BASE_URL is missing")
+
+    if base_url.endswith("/chat/completions"):
+        return base_url
+
+    return f"{base_url}/chat/completions"
+
+
+def task_text(task):
+    """
+    Preserve instruction, input, prompt, and context fields together.
+
+    Some evaluator tasks separate instructions from their actual data.
+    """
+    fields = (
+        "instruction",
+        "input",
+        "prompt",
+        "question",
+        "query",
+        "text",
+        "content",
+        "context",
+        "description",
+    )
+
+    parts = []
+    seen = set()
+
+    for field in fields:
+        value = task.get(field)
+
+        if value in (None, ""):
+            continue
+
+        if isinstance(value, (dict, list)):
+            rendered = json.dumps(
+                value,
+                ensure_ascii=False,
+            )
+        else:
+            rendered = str(value).strip()
+
+        if not rendered or rendered in seen:
+            continue
+
+        seen.add(rendered)
+        parts.append((field, rendered))
+
+    if len(parts) == 1:
+        return parts[0][1]
+
+    if parts:
+        return "\n\n".join(
+            f"{field.replace('_', ' ').title()}:\n{value}"
+            for field, value in parts
+        )
+
+    safe_task = {
+        key: value
+        for key, value in task.items()
+        if key not in ("task_id", "id")
+    }
+
+    return json.dumps(
+        safe_task,
+        ensure_ascii=False,
+    )
+
+def model_id_candidates(model, url):
+    """
+    Use the evaluator-provided model ID exactly as supplied.
+
+    The public Fireworks endpoint requires canonical IDs, so canonical
+    fallback is attempted only during direct api.fireworks.ai testing.
+    """
+    value = str(model).strip()
+
+    if not value:
+        raise ValueError("Selected model is empty")
+
+    candidates = [value]
+
+    if (
+        "api.fireworks.ai" in url.lower()
+        and not value.startswith("accounts/")
+        and "/" not in value
+    ):
+        candidates.append(f"accounts/fireworks/models/{value}")
+
+    return candidates
+
+
+def request_fireworks(task, request_model, api_key, url):
+    category = str(
+        task.get("task_type")
+        or task.get("category")
+        or task.get("type")
+        or "general"
+    )
+
+    payload = {
+        "model": request_model,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "Complete the task accurately and concisely. "
+                    "Follow every requested format or length constraint. "
+                    "Return only the requested answer. "
+                    f"Task category: {category}."
+                ),
+            },
+            {
+                "role": "user",
+                "content": task_text(task),
+            },
+        ],
+        "temperature": 0,
+        "max_tokens": 768,
+        "stream": False,
+    }
+
+    last_error = None
+
+    for attempt in range(2):
+        request = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
+        try:
+            with urllib.request.urlopen(request, timeout=90) as response:
+                body = json.loads(response.read().decode("utf-8"))
+
+            choices = body.get("choices", [])
+
+            if not choices:
+                raise RuntimeError("Response contains no choices")
+
+            message = choices[0].get("message", {})
+            content = message.get("content")
+
+            if not isinstance(content, str) or not content.strip():
+                raise RuntimeError("Response contains no answer text")
+
+            return content.strip()
+
+        except urllib.error.HTTPError as error:
+            details = error.read().decode(
+                "utf-8",
+                errors="replace",
+            )
+
+            last_error = RuntimeError(
+                f"Fireworks HTTP {error.code}: {details[:500]}"
+            )
+
+            if error.code not in (429, 500, 502, 503, 504):
+                break
+
+        except Exception as error:
+            last_error = error
+
+        if attempt == 0:
+            time.sleep(2)
+
+    raise last_error or RuntimeError("Fireworks request failed")
+
+
+def call_fireworks(task, model, api_key, url):
+    last_error = None
+
+    for request_model in model_id_candidates(model, url):
+        try:
+            log(f"Trying Fireworks model ID: {request_model}")
+            return request_fireworks(
+                task,
+                request_model,
+                api_key,
+                url,
+            )
+        except Exception as error:
+            last_error = error
+            log(
+                f"Model ID {request_model} failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    raise last_error or RuntimeError("All model-ID forms failed")
+
+
+def ordered_models(models):
+    ordered = []
+
+    for keyword in ("minimax", "gemma", "kimi"):
+        for model in models:
+            if keyword in model.lower() and model not in ordered:
+                ordered.append(model)
+
+    for model in models:
+        if model not in ordered:
+            ordered.append(model)
+
+    return ordered
+
+
+def call_fireworks_with_fallback(
+    task,
+    models,
+    api_key,
+    url,
+):
+    last_error = None
+
+    for model in ordered_models(models):
+        try:
+            log(f"Attempting allowed model: {model}")
+            return call_fireworks(
+                task,
+                model,
+                api_key,
+                url,
+            )
+        except Exception as error:
+            last_error = error
+            log(
+                f"Allowed model {model} failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    raise last_error or RuntimeError(
+        "All allowed Fireworks models failed"
+    )
+
+
+
+
+def detect_route(task):
+    """
+    Classify tasks conservatively.
+
+    Ambiguous tasks remain on the proven general MiniMax route.
+    """
+    metadata = " ".join(
+        str(task.get(field, ""))
+        for field in (
+            "task_type",
+            "category",
+            "type",
+        )
+    ).lower()
+
+    text = task_text(task).lower()
+    combined = f"{metadata}\n{text}"
+    padded = f" {combined} "
+
+    code_patterns = (
+        r"\b(?:fix|debug|repair|correct)\b.{0,50}"
+        r"\b(?:code|function|script|program)\b",
+
+        r"\b(?:code|function|script|program)\b.{0,50}"
+        r"\b(?:fix|debug|repair|correct)\b",
+
+        r"\b(?:write|implement|generate|create)\b.{0,40}"
+        r"\b(?:code|function|script|program)\b",
+
+        r"\b(?:python|javascript|typescript|java|c\+\+)\b"
+        r".{0,35}\b(?:code|function|script|program)\b",
+    )
+
+    if any(
+        re.search(pattern, combined)
+        for pattern in code_patterns
+    ):
+        return "code"
+
+    summary_patterns = (
+        r"\bsummari[sz](?:e|ation)\b",
+        r"\bwrite (?:a )?(?:brief )?summary\b",
+        r"\bbrief summary\b",
+        r"\bcondense\b",
+    )
+
+    if any(
+        re.search(pattern, combined)
+        for pattern in summary_patterns
+    ):
+        return "summarization"
+
+    sentiment_patterns = (
+        r"\bsentiment\b",
+        r"\bpositive or negative\b",
+        r"\bpositive, negative\b",
+        r"\bclassify (?:the )?review\b",
+    )
+
+    if any(
+        re.search(pattern, combined)
+        for pattern in sentiment_patterns
+    ):
+        return "sentiment"
+
+    ner_patterns = (
+        r"\bnamed entit(?:y|ies)\b",
+        r"\bentity extraction\b",
+        r"\bextract (?:the )?(?:named )?entities\b",
+        r"\bidentify (?:the )?(?:named )?entities\b",
+        r"\bner\b",
+    )
+
+    if any(
+        re.search(pattern, padded)
+        for pattern in ner_patterns
+    ):
+        return "ner"
+
+    logic_patterns = (
+        r"\bsyllogism\b",
+        r"\bdeductive\b",
+        r"\blogical conclusion\b",
+        r"\blogic puzzle\b",
+        r"\bdoes the conclusion follow\b",
+        r"\bentails?\b",
+    )
+
+    if any(
+        re.search(pattern, combined)
+        for pattern in logic_patterns
+    ):
+        return "logic"
+
+    if any(
+        marker in metadata
+        for marker in (
+            "math",
+            "arithmetic",
+            "calculation",
+            "numeric",
+        )
+    ):
+        return "math"
+
+    if re.fullmatch(
+        r"\s*(?:calculate|compute|evaluate)\s+"
+        r"[0-9eE.\s+\-*/%()^×÷−]+\s*[?.!]?\s*",
+        text,
+    ):
+        return "math"
+
+    if any(
+        marker in metadata
+        for marker in (
+            "factual",
+            "knowledge",
+            "question answering",
+            "question_answering",
+            "general knowledge",
+        )
+    ):
+        return "factual"
+
+    return "general"
+
+
+def routed_models(models, route):
+    """
+    Use the repeatedly qualified MiniMax path first.
+
+    Kimi and Gemma remain evaluator-approved fallbacks only. This preserves
+    accuracy while deterministic local arithmetic reduces Fireworks usage.
+    """
+    ordered = []
+
+    def add_matching(predicate):
+        for model in models:
+            lowered = model.lower()
+
+            if model not in ordered and predicate(lowered):
+                ordered.append(model)
+
+    # Proven primary for every uncertain remote task.
+    add_matching(lambda value: "minimax" in value)
+
+    # Route-specific secondary fallback.
+    if route == "code":
+        add_matching(lambda value: "kimi" in value)
+        add_matching(
+            lambda value:
+                "gemma" in value and "nvfp4" in value
+        )
+
+    elif route == "summarization":
+        add_matching(
+            lambda value:
+                "gemma" in value and "nvfp4" in value
+        )
+        add_matching(lambda value: "kimi" in value)
+
+    else:
+        add_matching(lambda value: "kimi" in value)
+        add_matching(
+            lambda value:
+                "gemma" in value and "nvfp4" in value
+        )
+
+    add_matching(lambda value: "gemma" in value)
+
+    for model in models:
+        if model not in ordered:
+            ordered.append(model)
+
+    return ordered
+
+
+_ALLOWED_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+
+_ALLOWED_UNARY_OPERATORS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+}
+
+
+def _evaluate_arithmetic_node(node):
+    if isinstance(node, ast.Expression):
+        return _evaluate_arithmetic_node(node.body)
+
+    if isinstance(node, ast.Constant):
+        if isinstance(node.value, bool):
+            raise ValueError("Boolean values are not arithmetic")
+
+        if isinstance(node.value, (int, float)):
+            return node.value
+
+        raise ValueError("Unsupported constant")
+
+    if isinstance(node, ast.UnaryOp):
+        operation = _ALLOWED_UNARY_OPERATORS.get(
+            type(node.op)
+        )
+
+        if operation is None:
+            raise ValueError("Unsupported unary operator")
+
+        return operation(
+            _evaluate_arithmetic_node(node.operand)
+        )
+
+    if isinstance(node, ast.BinOp):
+        operation = _ALLOWED_BINARY_OPERATORS.get(
+            type(node.op)
+        )
+
+        if operation is None:
+            raise ValueError("Unsupported binary operator")
+
+        left = _evaluate_arithmetic_node(node.left)
+        right = _evaluate_arithmetic_node(node.right)
+
+        if isinstance(node.op, ast.Pow):
+            if abs(right) > 10:
+                raise ValueError("Exponent exceeds safe limit")
+
+            if abs(left) > 1_000_000:
+                raise ValueError("Power base exceeds safe limit")
+
+        result = operation(left, right)
+
+        if not isinstance(result, (int, float)):
+            raise ValueError("Result is not numeric")
+
+        if abs(result) > 1_000_000_000_000_000:
+            raise ValueError("Result exceeds safe limit")
+
+        return result
+
+    raise ValueError(
+        f"Unsupported expression: {type(node).__name__}"
+    )
+
+
+def _arithmetic_text_candidates(task):
+    fields = (
+        "input",
+        "prompt",
+        "question",
+        "instruction",
+        "query",
+        "text",
+        "content",
+    )
+
+    candidates = []
+    seen = set()
+
+    for field in fields:
+        value = task.get(field)
+
+        if not isinstance(value, (str, int, float)):
+            continue
+
+        rendered = str(value).strip()
+
+        if rendered and rendered not in seen:
+            seen.add(rendered)
+            candidates.append(rendered)
+
+    combined = task_text(task).strip()
+
+    if combined and combined not in seen:
+        candidates.append(combined)
+
+    return candidates
+
+
+def _extract_arithmetic_expression(text):
+    normalized = (
+        text.strip()
+        .replace("×", "*")
+        .replace("÷", "/")
+        .replace("−", "-")
+    )
+
+    if not normalized or len(normalized) > 180:
+        return None
+
+    patterns = (
+        r"(?is)^(?:what\s+is|calculate|compute|evaluate|solve)"
+        r"\s+(.+?)[?.!]?$",
+
+        r"(?is)^(.+?)\s*=\s*\??$",
+
+        r"(?is)^([0-9eE.\s+\-*/%()^]+)[?.!]?$",
+    )
+
+    expression = None
+
+    for pattern in patterns:
+        match = re.fullmatch(pattern, normalized)
+
+        if match:
+            expression = match.group(1).strip()
+            break
+
+    if not expression:
+        return None
+
+    expression = expression.replace("^", "**")
+
+    if not re.fullmatch(
+        r"[0-9eE.\s+\-*/%()]+",
+        expression,
+    ):
+        return None
+
+    if len(expression) > 120:
+        return None
+
+    return expression
+
+
+def try_deterministic_arithmetic(task, route=None):
+    """
+    Solve only syntactically unambiguous arithmetic.
+
+    Word problems, variables, factual questions and natural-language
+    reasoning always return None and therefore escalate to Fireworks.
+    """
+    for candidate in _arithmetic_text_candidates(task):
+        expression = _extract_arithmetic_expression(
+            candidate
+        )
+
+        if expression is None:
+            continue
+
+        try:
+            tree = ast.parse(
+                expression,
+                mode="eval",
+            )
+
+            if len(list(ast.walk(tree))) > 40:
+                continue
+
+            value = _evaluate_arithmetic_node(tree)
+
+        except Exception:
+            continue
+
+        if isinstance(value, float):
+            if not math.isfinite(value):
+                continue
+
+            if value.is_integer():
+                return str(int(value))
+
+            return format(value, ".12g")
+
+        return str(value)
+
+    return None
+
+
+
+def call_routed_fireworks(
+    task,
+    models,
+    api_key,
+    url,
+    route,
+):
+    """
+    Try only evaluator-supplied models in the route-specific order.
+
+    Any model or transport failure falls through to the next permitted
+    model without using an external inference provider.
+    """
+    last_error = None
+    routed_task = dict(task)
+
+    if not routed_task.get("task_type"):
+        routed_task["task_type"] = route
+
+    for model in routed_models(models, route):
+        try:
+            log(
+                f"Route={route}; attempting allowed model: "
+                f"{model}"
+            )
+
+            return call_fireworks(
+                routed_task,
+                model,
+                api_key,
+                url,
+            )
+
+        except Exception as error:
+            last_error = error
+
+            log(
+                f"Route={route}; model {model} failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+    raise last_error or RuntimeError(
+        "All routed Fireworks models failed"
+    )
+
+
+def write_results(results):
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+    temporary_path = OUTPUT_PATH.with_suffix(".tmp")
+
+    with temporary_path.open("w", encoding="utf-8") as handle:
+        json.dump(results, handle, ensure_ascii=False, indent=2)
+
+    temporary_path.replace(OUTPUT_PATH)
+
+
+def main():
+    try:
+        tasks = load_tasks()
+    except Exception as error:
+        log(f"Input error: {error}")
+        write_results([])
+        return 1
+
+    if os.getenv("ROUTEIQ_MOCK", "0") == "1":
+        results = [
+            {
+                "task_id": task["task_id"],
+                "answer": f"mock-answer-for-{task['task_id']}",
+            }
+            for task in tasks
+        ]
+
+        write_results(results)
+        log(f"Wrote {len(results)} mock results")
+        return 0
+
+    api_key = os.getenv(
+        "FIREWORKS_API_KEY",
+        "",
+    ).strip()
+
+    if not api_key:
+        log("FIREWORKS_API_KEY is missing")
+
+        write_results([
+            {
+                "task_id": task["task_id"],
+                "answer": "",
+            }
+            for task in tasks
+        ])
+
+        return 1
+
+    try:
+        models = parse_allowed_models()
+        url = completion_url()
+
+    except Exception as error:
+        log(f"Configuration error: {error}")
+
+        write_results([
+            {
+                "task_id": task["task_id"],
+                "answer": "",
+            }
+            for task in tasks
+        ])
+
+        return 1
+
+    log(
+        "Allowed models: "
+        + ", ".join(models)
+    )
+
+    results = []
+    local_count = 0
+    remote_count = 0
+    failed_count = 0
+
+    for task in tasks:
+        task_id = task["task_id"]
+        route = detect_route(task)
+
+        try:
+            answer = try_deterministic_arithmetic(
+                task,
+                route,
+            )
+
+            if answer is not None:
+                local_count += 1
+
+                log(
+                    f"Task {task_id}: "
+                    f"route={route}; "
+                    "accepted deterministic local answer"
+                )
+
+            else:
+                remote_count += 1
+
+                answer = call_routed_fireworks(
+                    task,
+                    models,
+                    api_key,
+                    url,
+                    route,
+                )
+
+                log(
+                    f"Task {task_id}: "
+                    f"route={route}; "
+                    "completed through Fireworks"
+                )
+
+        except Exception as error:
+            failed_count += 1
+
+            log(
+                f"Task {task_id} failed: "
+                f"{type(error).__name__}: {error}"
+            )
+
+            answer = ""
+
+        results.append({
+            "task_id": task_id,
+            "answer": answer,
+        })
+
+        write_results(results)
+
+    log(
+        f"Wrote {len(results)} results; "
+        f"local={local_count}; "
+        f"remote={remote_count}; "
+        f"failed={failed_count}"
+    )
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

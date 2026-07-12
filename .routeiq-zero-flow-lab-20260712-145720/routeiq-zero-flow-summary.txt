@@ -1,0 +1,216 @@
+============================================================
+ OmniEdge RouteIQ zero-token flow laboratory
+============================================================
+Started:       Sun Jul 12 14:57:22 UTC 2026
+Repository:    /workspaces/omniedge-routeiq
+Source folder: /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/source-snapshot/track1-v181-agent
+Source mode:   Git snapshot from origin/track1-v18-zero-token-audit
+Base image:    ghcr.io/kaulastudies/omniedge-routeiq-track1:c-v181-9ce53f5e4565f102d057a4b00192572f2fd7fb7b
+Lab folder:    /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720
+Git branch:    track1-v121-guarded-qwen
+Git commit:    7540657
+Portal/source changes: NONE
+
+[1/8] Verifying the base image...
+Image=[ghcr.io/kaulastudies/omniedge-routeiq-track1:c-v181-9ce53f5e4565f102d057a4b00192572f2fd7fb7b] Architecture=amd64 OS=linux SizeBytes=2735995579
+
+[2/8] Creating the experimental category-microbatch router...
+Experimental patch created successfully.
+273:def call_qwen_microbatches(tasks: list[dict[str, Any]]) -> dict[str, str]:
+
+[3/8] Creating a fresh 19-task shadow benchmark...
+
+[4/8] Measuring deterministic-only coverage...
+
+------------------------------------------------------------
+Running case: canonical-deterministic
+Qwen enabled: 0
+Tasks: /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/canonical-tasks.json
+------------------------------------------------------------
+Local reject T01: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject T01b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject T01c: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept T02: ordered inventory word-problem pattern
+Local arithmetic accept T02b: exact recipe scaling and unit-cost pattern
+Local arithmetic accept M03: ordered inventory word-problem pattern
+Local arithmetic accept M04: exact chained discount-tax pattern
+Local sentiment accept T03: mixed sentiment with one-sentence balanced reason
+Local sentiment accept T03b: mixed sentiment with one-sentence balanced reason
+Local sentiment accept S03: mixed sentiment resolved with balanced label
+Local summary accept T04: extractive constraint-aware sentence summary
+Local summary accept T04b: extractive constraint-aware bullet summary
+Local ner accept T05: high-confidence contextual NER pattern
+Local ner accept N02: high-confidence contextual NER pattern
+Local code accept D01: high-confidence maximum-list implementation
+Local logic accept L01: uniquely solved assignment puzzle
+Local code accept C01: high-confidence second-distinct-largest implementation
+Local reject F04: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local logic accept L02: uniquely solved assignment puzzle
+Attempting local Qwen proposal batch for 4 tasks
+Running Qwen knowledge microbatch with 4 tasks
+Qwen knowledge microbatch failed: RuntimeError: Qwen local inference is disabled
+Qwen proposal accepted 0 of 0 recovered answers
+Routing summary: deterministic=15; qwen=0; remote=4
+Local-only benchmark: leaving 4 tasks unresolved
+Wrote 19 results; completed=15; missing=4; deterministic=15; qwen=0; remote_needed=4
+Container exit status: 0
+Runtime seconds: 10.368944
+Results coverage:
+completed=15/19 missing=['T01', 'T01b', 'T01c', 'F04']
+Scoring:
+GATE FAILED: require 19/19 correct, zero missing answers, and runtime <=420s
+BENCHMARK passed=15/19 wrong=[] missing=['T01', 'T01b', 'T01c', 'F04'] runtime=10.37s
+Scorer exit status: 1
+
+------------------------------------------------------------
+Running case: shadow-deterministic
+Qwen enabled: 0
+Tasks: /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/shadow/tasks.json
+------------------------------------------------------------
+Local reject X01: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X01b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X01c: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept X02: ordered inventory word-problem pattern
+Local reject X02b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept X03: ordered inventory word-problem pattern
+Local arithmetic accept X04: exact chained discount-tax pattern
+Local reject X05: arithmetic=no provably safe arithmetic pattern matched; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X05b: arithmetic=no provably safe arithmetic pattern matched; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X05c: arithmetic=task belongs to another category; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local summary accept X06: extractive constraint-aware sentence summary
+Local summary accept X06b: extractive constraint-aware bullet summary
+Local reject X07: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=NER pattern lacked a complete high-confidence entity set; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local ner accept X07b: high-confidence contextual NER pattern
+Local reject X08: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=no supported high-confidence code pattern; summary=task is not recognizably summarization
+Local reject X09: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=assignment puzzle could not be parsed confidently; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X10: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=no supported high-confidence code pattern; summary=task is not recognizably summarization
+Local reject X11: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X12: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=assignment puzzle could not be parsed confidently; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Attempting local Qwen proposal batch for 13 tasks
+Running Qwen knowledge microbatch with 5 tasks
+Qwen knowledge microbatch failed: RuntimeError: Qwen local inference is disabled
+Running Qwen reasoning microbatch with 5 tasks
+Qwen reasoning microbatch failed: RuntimeError: Qwen local inference is disabled
+Running Qwen language microbatch with 3 tasks
+Qwen language microbatch failed: RuntimeError: Qwen local inference is disabled
+Qwen proposal accepted 0 of 0 recovered answers
+Routing summary: deterministic=6; qwen=0; remote=13
+Local-only benchmark: leaving 13 tasks unresolved
+Wrote 19 results; completed=6; missing=13; deterministic=6; qwen=0; remote_needed=13
+Container exit status: 0
+Runtime seconds: 0.460197
+Results coverage:
+completed=6/19 missing=['X01', 'X01b', 'X01c', 'X02b', 'X05', 'X05b', 'X05c', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12']
+Scoring:
+SHADOW passed=5/19 accuracy=26.3% wrong=['X07b'] missing=['X01', 'X01b', 'X01c', 'X02b', 'X05', 'X05b', 'X05c', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12'] runtime=0.46s
+WRONG X07b: Aisha Khan — PERSON Anthropic — ORGANIZATION Singapore — LOCATION
+Scorer exit status: 1
+
+[5/8] Testing experimental zero-token microbatch flow...
+
+------------------------------------------------------------
+Running case: canonical-microbatch
+Qwen enabled: 1
+Tasks: /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/canonical-tasks.json
+------------------------------------------------------------
+Local reject T01: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject T01b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject T01c: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept T02: ordered inventory word-problem pattern
+Local arithmetic accept T02b: exact recipe scaling and unit-cost pattern
+Local arithmetic accept M03: ordered inventory word-problem pattern
+Local arithmetic accept M04: exact chained discount-tax pattern
+Local sentiment accept T03: mixed sentiment with one-sentence balanced reason
+Local sentiment accept T03b: mixed sentiment with one-sentence balanced reason
+Local sentiment accept S03: mixed sentiment resolved with balanced label
+Local summary accept T04: extractive constraint-aware sentence summary
+Local summary accept T04b: extractive constraint-aware bullet summary
+Local ner accept T05: high-confidence contextual NER pattern
+Local ner accept N02: high-confidence contextual NER pattern
+Local code accept D01: high-confidence maximum-list implementation
+Local logic accept L01: uniquely solved assignment puzzle
+Local code accept C01: high-confidence second-distinct-largest implementation
+Local reject F04: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local logic accept L02: uniquely solved assignment puzzle
+Attempting local Qwen proposal batch for 4 tasks
+Running Qwen knowledge microbatch with 4 tasks
+Qwen knowledge microbatch failed: RuntimeError: Qwen proposal timed out after 180s with no recoverable answers
+Qwen proposal accepted 0 of 0 recovered answers
+Routing summary: deterministic=15; qwen=0; remote=4
+Local-only benchmark: leaving 4 tasks unresolved
+Wrote 19 results; completed=15; missing=4; deterministic=15; qwen=0; remote_needed=4
+Container exit status: 0
+Runtime seconds: 180.789739
+Results coverage:
+completed=15/19 missing=['T01', 'T01b', 'T01c', 'F04']
+Scoring:
+GATE FAILED: require 19/19 correct, zero missing answers, and runtime <=420s
+BENCHMARK passed=15/19 wrong=[] missing=['T01', 'T01b', 'T01c', 'F04'] runtime=180.79s
+Scorer exit status: 1
+
+------------------------------------------------------------
+Running case: shadow-microbatch
+Qwen enabled: 1
+Tasks: /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/shadow/tasks.json
+------------------------------------------------------------
+Local reject X01: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X01b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X01c: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept X02: ordered inventory word-problem pattern
+Local reject X02b: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local arithmetic accept X03: ordered inventory word-problem pattern
+Local arithmetic accept X04: exact chained discount-tax pattern
+Local reject X05: arithmetic=no provably safe arithmetic pattern matched; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X05b: arithmetic=no provably safe arithmetic pattern matched; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X05c: arithmetic=task belongs to another category; sentiment=prompt does not match supported sentiment format; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local summary accept X06: extractive constraint-aware sentence summary
+Local summary accept X06b: extractive constraint-aware bullet summary
+Local reject X07: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=NER pattern lacked a complete high-confidence entity set; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local ner accept X07b: high-confidence contextual NER pattern
+Local reject X08: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=no supported high-confidence code pattern; summary=task is not recognizably summarization
+Local reject X09: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=assignment puzzle could not be parsed confidently; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X10: arithmetic=task belongs to another category; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=no supported high-confidence code pattern; summary=task is not recognizably summarization
+Local reject X11: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=no supported assignment-puzzle signature; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Local reject X12: arithmetic=no provably safe arithmetic pattern matched; sentiment=task is not recognizably sentiment classification; logic=assignment puzzle could not be parsed confidently; ner=task is not recognizably named-entity extraction; code=task is not recognizably Python code; summary=task is not recognizably summarization
+Attempting local Qwen proposal batch for 13 tasks
+Running Qwen knowledge microbatch with 5 tasks
+Qwen knowledge microbatch failed: RuntimeError: Qwen proposal timed out after 180s with no recoverable answers
+Running Qwen reasoning microbatch with 5 tasks
+Qwen reasoning microbatch failed: RuntimeError: Qwen proposal timed out after 180s with no recoverable answers
+Running Qwen language microbatch with 3 tasks
+Qwen proposal validation rejected X05b: sentiment reason is not exactly one sentence
+Qwen proposal accepted 1 of 2 recovered answers
+Routing summary: deterministic=6; qwen=1; remote=12
+Local-only benchmark: leaving 12 tasks unresolved
+Wrote 19 results; completed=7; missing=12; deterministic=6; qwen=1; remote_needed=12
+Container exit status: 0
+Runtime seconds: 542.118635
+Results coverage:
+completed=7/19 missing=['X01', 'X01b', 'X01c', 'X02b', 'X05', 'X05b', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12']
+Scoring:
+SHADOW passed=6/19 accuracy=31.6% wrong=['X07b'] missing=['X01', 'X01b', 'X01c', 'X02b', 'X05', 'X05b', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12'] runtime=542.12s
+WRONG X07b: Aisha Khan — PERSON Anthropic — ORGANIZATION Singapore — LOCATION
+Scorer exit status: 1
+
+[6/8] Original-flow comparison skipped (RUN_ORIGINAL=0).
+
+[7/8] Producing consolidated decision report...
+
+================ CONSOLIDATED RESULTS ================
+canonical-deterministic      15/19 ( 78.9%) runtime=  10.37s wrong=[] missing=['T01', 'T01b', 'T01c', 'F04']
+shadow-deterministic          5/19 ( 26.3%) runtime=   0.46s wrong=['X07b'] missing=['X01', 'X01b', 'X01c', 'X02b', 'X05', 'X05b', 'X05c', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12']
+canonical-microbatch         15/19 ( 78.9%) runtime= 180.79s wrong=[] missing=['T01', 'T01b', 'T01c', 'F04']
+shadow-microbatch             6/19 ( 31.6%) runtime= 542.12s wrong=['X07b'] missing=['X01', 'X01b', 'X01c', 'X02b', 'X05', 'X05b', 'X07', 'X08', 'X09', 'X10', 'X11', 'X12']
+
+VERDICT: DO NOT PACKAGE OR SUBMIT
+NEXT STEP: The current local flow is not reliable enough. Preserve the safe hybrid image and use these logs to repair correctness before another candidate build.
+======================================================
+
+[8/8] Finished.
+Full text report:       /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/routeiq-zero-flow-summary.txt
+Machine-readable report: /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/consolidated-report.json
+Per-run outputs/logs:    /workspaces/omniedge-routeiq/.routeiq-zero-flow-lab-20260712-145720/runs/
+
+IMPORTANT: This lab did not commit, push, build a new registry image,
+or touch the active ACT II submission.
+Completed: Sun Jul 12 15:09:44 UTC 2026

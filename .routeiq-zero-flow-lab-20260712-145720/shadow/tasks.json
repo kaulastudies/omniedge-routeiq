@@ -1,0 +1,97 @@
+[
+  {
+    "task_id": "X01",
+    "task_type": "factual_knowledge",
+    "prompt": "Briefly explain the difference between TCP and UDP. Mention connection setup, reliability, and a typical use case for each."
+  },
+  {
+    "task_id": "X01b",
+    "task_type": "factual_knowledge",
+    "prompt": "What are the main inputs and outputs of photosynthesis? Answer briefly."
+  },
+  {
+    "task_id": "X01c",
+    "task_type": "factual_knowledge",
+    "prompt": "Explain the difference between an SSD and an HDD, including how each stores data and one practical advantage of SSDs."
+  },
+  {
+    "task_id": "X02",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A warehouse starts with 3,200 units. It sells 25% of them, restocks 450 units, and then sells 600 units. How many units remain?"
+  },
+  {
+    "task_id": "X02b",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A recipe uses 2/3 cup of flour for 8 muffins. How much flour is needed for 20 muffins? If flour costs $3.00 per cup, what is the cost?"
+  },
+  {
+    "task_id": "X03",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A shop has 500 items. It sells 18% on Monday and 75 more on Tuesday. How many items remain?"
+  },
+  {
+    "task_id": "X04",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A $1,800 laptop is discounted by 20%, then 12% tax is applied to the discounted price. What is the final price?"
+  },
+  {
+    "task_id": "X05",
+    "task_type": "sentiment_classification",
+    "prompt": "Classify as Positive, Negative, Neutral, or Mixed and give exactly one sentence of reasoning: 'Delivery was late and the carton was torn, but the product performs excellently and support replaced the missing cable immediately.'"
+  },
+  {
+    "task_id": "X05b",
+    "task_type": "sentiment_classification",
+    "prompt": "Classify as Positive, Negative, Neutral, or Mixed and give exactly one sentence of reasoning: 'The phone is fast and the camera is sharp, although the battery drains sooner than expected.'"
+  },
+  {
+    "task_id": "X05c",
+    "task_type": "sentiment_classification",
+    "prompt": "Classify the sentiment as Positive, Negative, Neutral, or Mixed: 'The application loads quickly, but customization options are limited.'"
+  },
+  {
+    "task_id": "X06",
+    "task_type": "text_summarization",
+    "prompt": "Summarize the following in exactly two sentences: 'Artificial intelligence is helping farmers detect crop disease, forecast yields, and use water more efficiently. These tools can improve productivity and reduce waste. However, small farms may struggle with device costs, unreliable connectivity, limited local-language support, and uncertainty about ownership of agricultural data.'"
+  },
+  {
+    "task_id": "X06b",
+    "task_type": "text_summarization",
+    "prompt": "Summarize the following in exactly three bullet points, each no longer than 15 words: 'Online education expands access and gives learners more control over scheduling. It can reduce travel and accommodation costs. Challenges include weak engagement, unequal internet access, and limited hands-on practice. Institutions are investing in interactive platforms, mentoring, and hybrid learning spaces.'"
+  },
+  {
+    "task_id": "X07",
+    "task_type": "named_entity_recognition",
+    "prompt": "Extract and label all named entities as PERSON, ORGANIZATION, LOCATION, or DATE: 'On April 8 2024, Satya Nadella said Microsoft would open a research centre in London with University College London.'"
+  },
+  {
+    "task_id": "X07b",
+    "task_type": "named_entity_recognition",
+    "prompt": "Extract all named entities and their types from: Aisha Khan joined Anthropic in Singapore last Tuesday."
+  },
+  {
+    "task_id": "X08",
+    "task_type": "code_debugging",
+    "prompt": "This function should return the sum of a list but is incorrect: def total(nums): return nums[0]. Fix it."
+  },
+  {
+    "task_id": "X09",
+    "task_type": "logical_deductive_reasoning",
+    "prompt": "Noah, Mira, and Leo each own a different pet: rabbit, fish, or dog. Mira owns the fish. Leo does not own the dog. Who owns the dog?"
+  },
+  {
+    "task_id": "X10",
+    "task_type": "code_generation",
+    "prompt": "Write a Python function that returns the second-smallest distinct number in a list and handles duplicates correctly."
+  },
+  {
+    "task_id": "X11",
+    "task_type": "factual_knowledge",
+    "prompt": "What is the capital of Canada, and what river runs through or beside it?"
+  },
+  {
+    "task_id": "X12",
+    "task_type": "logical_deductive_reasoning",
+    "prompt": "Ira, Dev, and Nia each chose a different snack: fruit, sandwich, or soup. Dev chose soup. Nia did not choose fruit. Who chose fruit?"
+  }
+]
