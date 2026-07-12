@@ -1,0 +1,22 @@
+FROM routeiq-v14-ultra-local:base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    ROUTEIQ_LOCAL_ONLY=1 \
+    ROUTEIQ_TOTAL_BUDGET_SECONDS=575 \
+    QWEN_ENABLED=1 \
+    QWEN_BINARY=/app/llama-completion \
+    QWEN_MODEL_PATH=/app/models/Qwen3-4B-Q4_K_M.gguf \
+    QWEN_THREADS=2 \
+    QWEN_CONTEXT_SIZE=4096 \
+    QWEN_PROPOSAL_MODE=thinking \
+    QWEN_PROPOSAL_MAX_TOKENS=1800 \
+    QWEN_PROPOSAL_TIMEOUT_SECONDS=430 \
+    QWEN_AUDIT_ENABLED=0 \
+    QWEN_REASONING_BUDGET=768 \
+    QWEN_PRESENCE_PENALTY=0.0
+
+COPY agent.py /app/agent.py
+COPY local /app/local
+
+ENTRYPOINT ["python3", "/app/agent.py"]

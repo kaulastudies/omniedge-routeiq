@@ -1,0 +1,97 @@
+[
+  {
+    "task_id": "T01",
+    "task_type": "factual_knowledge",
+    "prompt": "Name the three primary colors in the RGB color model and briefly explain why displays use RGB instead of RYB."
+  },
+  {
+    "task_id": "T01b",
+    "task_type": "factual_knowledge",
+    "prompt": "What is the difference between machine learning and deep learning? Briefly explain how each works."
+  },
+  {
+    "task_id": "T01c",
+    "task_type": "factual_knowledge",
+    "prompt": "Explain the difference between RAM and ROM in a computer. What is each type used for?"
+  },
+  {
+    "task_id": "T02",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A warehouse starts with 2,400 units. In Q1 it sells 37% of stock. In Q2 it restocks 800 units. In Q3 it sells 640 units. How many units remain at the end of Q3?"
+  },
+  {
+    "task_id": "T02b",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A recipe requires 3/4 cup of sugar for 12 cookies. How much sugar is needed for 30 cookies? If sugar costs $2.40 per cup, what is the total cost of sugar for 30 cookies?"
+  },
+  {
+    "task_id": "M03",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A store has 240 items. It sells 15% on Monday and 60 more on Tuesday. How many items remain?"
+  },
+  {
+    "task_id": "M04",
+    "task_type": "mathematical_reasoning",
+    "prompt": "A store discounts a $2,400 product by 15%, then applies 18% tax to the discounted price. What is the final price?"
+  },
+  {
+    "task_id": "T03",
+    "task_type": "sentiment_classification",
+    "prompt": "Classify the sentiment of this customer review as Positive, Negative, or Neutral and give a one-sentence reason: 'The product arrived two days late and the packaging was damaged, but the item worked perfectly and customer support resolved my complaint within an hour.'"
+  },
+  {
+    "task_id": "T03b",
+    "task_type": "sentiment_classification",
+    "prompt": "Classify the sentiment of this tweet as Positive, Negative, or Neutral and give a one-sentence reason: 'Just got my order. Box was dented and the manual was missing, but honestly the device itself is flawless and set up in under 5 minutes.'"
+  },
+  {
+    "task_id": "S03",
+    "task_type": "sentiment_classification",
+    "prompt": "Classify the sentiment of this review: The battery life is great, but the screen scratches too easily."
+  },
+  {
+    "task_id": "T04",
+    "task_type": "text_summarization",
+    "prompt": "Summarize the following passage in exactly two sentences: 'Machine learning is increasingly deployed in healthcare for diagnosis, treatment planning, and patient monitoring. These systems analyse medical images, predict patient deterioration, and spot patterns in electronic health records that might be missed by human clinicians. However, concerns remain about model interpretability, data privacy, liability when errors occur, and the potential for algorithmic bias to worsen existing healthcare disparities. Regulatory frameworks are still catching up with the pace of deployment, creating uncertainty for healthcare providers and technology developers alike.'"
+  },
+  {
+    "task_id": "T04b",
+    "task_type": "text_summarization",
+    "prompt": "Summarize the following passage in exactly three bullet points, each no longer than 15 words: 'Remote work has transformed how companies operate globally. Employees gain flexibility and reduced commute times, leading to reported improvements in work-life balance. However, challenges persist around collaboration, company culture, and the blurring of personal and professional boundaries. Organisations are responding by investing in digital collaboration tools and rethinking office space as a hub for social and creative work rather than daily attendance.'"
+  },
+  {
+    "task_id": "T05",
+    "task_type": "named_entity_recognition",
+    "prompt": "Extract all named entities from the following text and label each as PERSON, ORGANIZATION, LOCATION, or DATE: 'On March 15 2023, Sundar Pichai announced that Google would open a new AI research lab in Zurich, partnering with ETH Zurich to focus on large language model safety.'"
+  },
+  {
+    "task_id": "N02",
+    "task_type": "named_entity_recognition",
+    "prompt": "Extract all named entities and their types from: Maria Sanchez joined Fireworks AI in Berlin last March."
+  },
+  {
+    "task_id": "D01",
+    "task_type": "code_debugging",
+    "prompt": "This function should return the max of a list but has a bug: def get_max(nums): return nums[0]. Find and fix it."
+  },
+  {
+    "task_id": "L01",
+    "task_type": "logical_deductive_reasoning",
+    "prompt": "Three friends, Sam, Jo, and Lee, each own a different pet: cat, dog, bird. Sam does not own the bird. Jo owns the dog. Who owns the cat?"
+  },
+  {
+    "task_id": "C01",
+    "task_type": "code_generation",
+    "prompt": "Write a Python function that returns the second-largest number in a list, handling duplicates correctly."
+  },
+  {
+    "task_id": "F04",
+    "task_type": "factual_knowledge",
+    "prompt": "What is the capital of Australia, and what body of water is it near?"
+  },
+  {
+    "task_id": "L02",
+    "task_type": "logical_deductive_reasoning",
+    "prompt": "Three students, Ava, Ben, and Cara, each chose a different drink: tea, coffee, juice. Ava did not choose tea. Ben chose coffee. Cara chose tea. Who chose juice?"
+  }
+]
