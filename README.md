@@ -19,15 +19,15 @@ The final qualified leaderboard snapshot observed near the close of the AMD Deve
 | Metric | Final observed result |
 |---|---:|
 | Track | Hybrid Token-Efficient Routing Agent |
-| Leaderboard position | **17th** |
-| Accuracy | **94.7%** |
-| Fireworks tokens | **3,100** |
-| Qualified tasks | **18 of 19** |
+| Leaderboard position | **15th** |
+| Accuracy | **100.0%** |
+| Fireworks tokens | **3,296** |
+| Qualified tasks | **19 of 19** |
 | Initial qualified baseline | 12,531 tokens at 84.2% accuracy |
-| Token reduction from initial baseline | **75.3%** |
+| Token reduction from initial baseline | **73.7%** |
 | Status | Qualified, scored, and preserved |
 
-The team stopped further high-risk experiments during the closing hours to protect the qualified score and avoid losing the position through regressions, schema errors, timeouts, or infrastructure failures.
+After reaching 100% accuracy, the team stopped further high-risk token experiments and preserved the scored candidate to avoid regressions, schema errors, timeouts, or infrastructure failures.
 
 > This is the final leaderboard result observed by the team. Prize decisions, manual reviews, or organizer-side adjustments may be reported separately.
 
@@ -38,13 +38,13 @@ The team stopped further high-risk experiments during the closing hours to prote
 | Early qualified run | 84.2% | 12,531 | Established a valid scoring baseline |
 | Major optimization | 94.7% | 3,974 | Reached the top 10 in an earlier snapshot |
 | Local-first experiment | 89.5% | 3,421 | Lower token use, but accuracy regressed |
-| Final preserved run | **94.7%** | **3,100** | Finished at the observed **17th position** |
+| Final scored run | **100.0%** | **3,296** | Reached the observed **15th position** with all 19 tasks correct |
 
 ### Final experimental learning
 
-A separate v1.8.1 single-pass local candidate completed an internal 19-task benchmark using deterministic solvers and local inference without Fireworks calls. It reached 18 of 19 locally, but the team did not treat it as the final protected submission because one incorrect answer could have reduced the official score.
+Before the final score, the v1.8.1 single-pass candidate reached 18 of 19 in the internal benchmark. The later official evaluator run achieved 100% accuracy with 3,296 Fireworks tokens, confirming that the final candidate resolved the remaining benchmark case.
 
-This experiment remains useful research for future zero-token routing work.
+The internal zero-Fireworks experiment remains useful research for future token reduction, while the 100% scored candidate is preserved as the final benchmark baseline.
 
 ---
 

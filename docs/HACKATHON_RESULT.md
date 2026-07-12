@@ -7,12 +7,12 @@
 | Project | OmniEdge RouteIQ — Local-First Intelligent Router |
 | Team | OmniEdge RouteIQ |
 | Track | Hybrid Token-Efficient Routing Agent |
-| Final observed leaderboard position | 17th |
-| Accuracy | 94.7% |
-| Fireworks tokens | 3,100 |
+| Final observed leaderboard position | 15th |
+| Accuracy | 100.0% |
+| Fireworks tokens | 3,296 |
 | First submission | July 10, 2026 at 16:59 GMT+5:30 |
-| Final recorded resubmission | July 12, 2026 at 20:47 GMT+5:30 |
-| Final recorded score time | July 12, 2026 at 21:37 GMT+5:30 |
+| Final recorded resubmission | July 12, 2026 at 22:36 GMT+5:30 |
+| Final recorded score time | July 13, 2026 at 00:18 GMT+5:30 |
 | Result status | Qualified and scored |
 
 This file records the result observed by the team near the close of the hackathon. Organizer-side reviews, prize decisions, or later corrections should be appended as a new dated section rather than overwriting this record.
@@ -24,18 +24,18 @@ This file records the result observed by the team near the close of the hackatho
 | First scored qualified version | 84.2% | 12,531 | Established valid evaluator execution |
 | Improved qualified version | 94.7% | 3,974 | Large accuracy and token improvement |
 | Local-first lower-token attempt | 89.5% | 3,421 | Accuracy regression |
-| Final protected version | 94.7% | 3,100 | Final observed 17th position |
+| Final scored version | 100.0% | 3,296 | Final observed 15th position; 19 of 19 correct |
 
 ## Improvement
 
-From 12,531 to 3,100 Fireworks tokens:
+From 12,531 to 3,296 Fireworks tokens:
 
 ```text
-Token reduction = 9,431
-Percentage reduction = 75.3%
+Token reduction = 9,235
+Percentage reduction = 73.7%
 ```
 
-The final score also improved from 84.2% to 94.7%.
+The final score also improved from 84.2% to 100.0%.
 
 ## Infrastructure Events
 
@@ -54,17 +54,17 @@ Documentation rule:
 A v1.8.1 single-pass local-only candidate completed an internal 19-task benchmark with:
 
 - 19 results written;
-- 18 of 19 locally correct in the test harness;
+- 18 of 19 locally correct in the earlier internal test harness;
 - zero Fireworks calls in that internal run;
 - one remaining incorrect factual answer.
 
-It was treated as an experiment rather than the protected final submission because official ranking depended first on correctness. The experiment should be used as a future R&D baseline, not presented as the final organizer score.
+That internal run was treated as an experiment because official ranking depended first on correctness. The later evaluator run reached 100.0% accuracy with 3,296 tokens and became the final protected benchmark result.
 
 Private candidate references, hidden benchmark files, and non-public image identifiers must not be copied into public documentation.
 
 ## Closing Decision
 
-With only a few hours remaining, the team preserved the 94.7% / 3,100-token qualified submission rather than risk:
+After reaching 100.0% accuracy with 3,296 tokens, the team preserved the qualified submission rather than risk:
 
 - lower accuracy;
 - output-schema regression;
