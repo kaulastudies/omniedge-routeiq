@@ -1,0 +1,534 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import ast
+import json
+import os
+import re
+import sys
+import urllib.error
+import urllib.request
+from pathlib import Path
+from typing import Any
+
+from local.arithmetic import solve_arithmetic
+from local.sentiment import solve_sentiment
+
+INPUT_PATH = Path(os.getenv("INPUT_PATH", "/input/tasks.json"))
+OUTPUT_PATH = Path(os.getenv("OUTPUT_PATH", "/output/results.json"))
+
+TEXT_KEYS = (
+    "prompt", "question", "instruction", "query", "text", "input",
+)
+
+
+def log(message: str) -> None:
+    print(message, file=sys.stderr, flush=True)
+
+
+def load_tasks() -> list[dict[str, Any]]:
+    with INPUT_PATH.open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+
+    if isinstance(payload, list):
+        raw_tasks = payload
+    elif isinstance(payload, dict) and isinstance(payload.get("tasks"), list):
+        raw_tasks = payload["tasks"]
+    else:
+        raise ValueError("tasks.json must be a list or contain a tasks list")
+
+    tasks: list[dict[str, Any]] = []
+    for index, raw in enumerate(raw_tasks):
+        if not isinstance(raw, dict):
+            raise ValueError(f"Task {index} is not an object")
+        task = dict(raw)
+        if "task_id" not in task:
+            if "id" in task:
+                task["task_id"] = task["id"]
+            else:
+                raise ValueError(f"Task {index} has no task_id")
+        tasks.append(task)
+    return tasks
+
+
+def write_results(results: list[dict[str, str]]) -> None:
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temporary = OUTPUT_PATH.with_suffix(".tmp")
+    with temporary.open("w", encoding="utf-8") as handle:
+        json.dump(results, handle, ensure_ascii=False, separators=(",", ":"))
+    temporary.replace(OUTPUT_PATH)
+
+
+def task_text(task: dict[str, Any]) -> str:
+    for key in TEXT_KEYS:
+        value = task.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+
+    for nested_key in ("task", "payload", "data"):
+        value = task.get(nested_key)
+        if isinstance(value, dict):
+            nested = task_text(value)
+            if nested:
+                return nested
+    return ""
+
+
+def task_text_for_local(task: dict[str, Any]) -> str:
+    return task_text(task)
+
+
+def parse_allowed_models() -> list[str]:
+    raw = os.getenv("ALLOWED_MODELS", "").strip()
+    if not raw:
+        raise ValueError("ALLOWED_MODELS is missing")
+
+    try:
+        decoded = json.loads(raw)
+        if isinstance(decoded, list):
+            models = [str(item).strip() for item in decoded if str(item).strip()]
+            if models:
+                return models
+    except json.JSONDecodeError:
+        pass
+
+    normalized = raw.replace(";", ",").replace("\n", ",")
+    pieces = normalized.split(",") if "," in normalized else normalized.split()
+    models = [piece.strip() for piece in pieces if piece.strip()]
+    if not models:
+        raise ValueError("ALLOWED_MODELS has no usable models")
+    return models
+
+
+def ordered_models(models: list[str]) -> list[str]:
+    ordered: list[str] = []
+    for keyword in ("minimax", "gemma-4-31b", "kimi", "gemma"):
+        for model in models:
+            if keyword in model.lower() and model not in ordered:
+                ordered.append(model)
+    for model in models:
+        if model not in ordered:
+            ordered.append(model)
+    return ordered
+
+
+def completion_url() -> str:
+    base = os.getenv("FIREWORKS_BASE_URL", "").strip().rstrip("/")
+    if not base:
+        raise ValueError("FIREWORKS_BASE_URL is missing")
+    if base.endswith("/chat/completions"):
+        return base
+    return f"{base}/chat/completions"
+
+
+def model_candidates(model: str, url: str) -> list[str]:
+    value = model.strip()
+    candidates = [value]
+    if (
+        "api.fireworks.ai" in url.lower()
+        and not value.startswith("accounts/")
+        and "/" not in value
+    ):
+        candidates.append(f"accounts/fireworks/models/{value}")
+    return candidates
+
+
+def compact_task_content(task: dict[str, Any]) -> dict[str, Any]:
+    """Preserve task meaning while shortening common field names."""
+    content: dict[str, Any] = {}
+    prompt_written = False
+
+    for key, value in task.items():
+        if key in ("task_id", "id"):
+            continue
+        if key == "task_type":
+            content["t"] = value
+        elif key in TEXT_KEYS and isinstance(value, str) and value.strip():
+            if not prompt_written:
+                content["p"] = value.strip()
+                prompt_written = True
+            elif value.strip() != content.get("p"):
+                content[key] = value
+        else:
+            content[key] = value
+    return content
+
+
+def compact_tasks(tasks: list[dict[str, Any]]) -> str:
+    payload = [
+        [index, compact_task_content(task)]
+        for index, task in enumerate(tasks)
+    ]
+    return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
+def strip_fences(content: str) -> str:
+    cleaned = content.strip()
+    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\s*```$", "", cleaned)
+    return cleaned.strip()
+
+
+def extract_json(content: str) -> Any:
+    cleaned = strip_fences(content)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    object_start, object_end = cleaned.find("{"), cleaned.rfind("}")
+    if object_start != -1 and object_end > object_start:
+        try:
+            return json.loads(cleaned[object_start:object_end + 1])
+        except json.JSONDecodeError:
+            pass
+
+    array_start, array_end = cleaned.find("["), cleaned.rfind("]")
+    if array_start != -1 and array_end > array_start:
+        return json.loads(cleaned[array_start:array_end + 1])
+    raise ValueError("Model response did not contain valid JSON")
+
+
+def normalize_answer(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value.strip()
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+def parse_batch_results(content: str, tasks: list[dict[str, Any]]) -> dict[str, str]:
+    decoded = extract_json(content)
+    if isinstance(decoded, dict):
+        for key in ("r", "results", "answers", "data"):
+            if isinstance(decoded.get(key), list):
+                decoded = decoded[key]
+                break
+
+    if not isinstance(decoded, list):
+        raise ValueError("Batch response is not a result list")
+
+    expected = [str(task["task_id"]) for task in tasks]
+    answers: dict[str, str] = {}
+
+    for position, item in enumerate(decoded):
+        index: int | None = None
+        answer: Any = None
+
+        if isinstance(item, list) and len(item) >= 2:
+            raw_index, answer = item[0], item[1]
+            if isinstance(raw_index, int):
+                index = raw_index
+            elif isinstance(raw_index, str) and raw_index.isdigit():
+                index = int(raw_index)
+        elif isinstance(item, dict):
+            raw_index = item.get("i", item.get("index"))
+            raw_id = item.get("task_id", item.get("id"))
+            answer = item.get("a", item.get("answer"))
+            if answer is None:
+                for alternate in ("output", "response", "result"):
+                    if alternate in item:
+                        answer = item[alternate]
+                        break
+            if isinstance(raw_index, int):
+                index = raw_index
+            elif isinstance(raw_index, str) and raw_index.isdigit():
+                index = int(raw_index)
+            elif raw_id is not None and str(raw_id) in expected:
+                task_id = str(raw_id)
+                normalized = normalize_answer(answer)
+                if normalized and task_id not in answers:
+                    answers[task_id] = normalized
+                continue
+        else:
+            continue
+
+        if index is None and position < len(expected):
+            index = position
+        if index is None or not 0 <= index < len(expected):
+            continue
+
+        task_id = expected[index]
+        normalized = normalize_answer(answer)
+        if normalized and task_id not in answers:
+            answers[task_id] = normalized
+
+    return answers
+
+
+def infer_kind(task: dict[str, Any]) -> str:
+    task_type = str(task.get("task_type", "")).lower()
+    prompt = task_text(task).lower()
+    joined = f"{task_type} {prompt}"
+    if any(term in joined for term in ("python", "code", "function", "debug")):
+        return "code"
+    if "named entit" in joined or " ner " in f" {joined} ":
+        return "ner"
+    if "summar" in joined or "bullet" in joined or "sentence" in joined:
+        return "summary"
+    if "sentiment" in joined:
+        return "sentiment"
+    if any(term in task_type for term in ("math", "arithmetic", "reasoning")):
+        return "math"
+    if "logic" in task_type:
+        return "logic"
+    return "factual"
+
+
+def completion_budget(tasks: list[dict[str, Any]]) -> int:
+    per_kind = {
+        "factual": 110,
+        "math": 100,
+        "sentiment": 100,
+        "summary": 180,
+        "ner": 200,
+        "logic": 130,
+        "code": 420,
+    }
+    total = sum(per_kind[infer_kind(task)] for task in tasks)
+    return min(3072, max(160, total))
+
+
+def validate_answer(task: dict[str, Any], answer: str) -> tuple[bool, str]:
+    if not isinstance(answer, str) or not answer.strip():
+        return False, "empty answer"
+
+    prompt = task_text(task)
+    lowered = prompt.lower()
+    stripped = answer.strip()
+
+    if "python" in lowered or "python" in str(task.get("task_type", "")).lower():
+        candidate = stripped
+        fenced = re.search(r"```(?:python)?\s*(.*?)```", candidate, flags=re.DOTALL | re.IGNORECASE)
+        if fenced:
+            candidate = fenced.group(1).strip()
+        try:
+            ast.parse(candidate)
+        except SyntaxError:
+            return False, "invalid Python syntax"
+
+    bullet_match = re.search(r"exactly\s+(\d+)\s+bullets?", lowered)
+    if bullet_match:
+        required = int(bullet_match.group(1))
+        bullets = [line for line in stripped.splitlines() if re.match(r"^\s*[-*•]\s+", line)]
+        if len(bullets) != required:
+            return False, f"expected exactly {required} bullets"
+        word_limit = re.search(r"(?:at most|no more than|maximum|max)\s+(\d+)\s+words?", lowered)
+        if word_limit:
+            maximum = int(word_limit.group(1))
+            for bullet in bullets:
+                words = re.findall(r"\b[\w'-]+\b", re.sub(r"^\s*[-*•]\s+", "", bullet))
+                if len(words) > maximum:
+                    return False, f"bullet exceeds {maximum} words"
+
+    sentence_match = re.search(r"exactly\s+(\d+)\s+sentences?", lowered)
+    if sentence_match:
+        required = int(sentence_match.group(1))
+        sentences = [part for part in re.split(r"(?<=[.!?])\s+", stripped) if part.strip()]
+        if len(sentences) != required:
+            return False, f"expected exactly {required} sentences"
+
+    return True, "valid"
+
+
+def _perform_request(payload: dict[str, Any], api_key: str, url: str) -> dict[str, Any]:
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8"),
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+    )
+    with urllib.request.urlopen(request, timeout=150) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def request_batch(
+    tasks: list[dict[str, Any]],
+    model: str,
+    api_key: str,
+    url: str,
+    repair_reasons: dict[str, str] | None = None,
+) -> dict[str, str]:
+    system_prompt = (
+        'Solve each independent task accurately and concisely. Return JSON only as '
+        '{"r":[[index,"answer"],...]}. Include every index once. Obey exact format, '
+        'length, and language. Put only the final answer in each string; include explanation '
+        'or complete code only when requested.'
+    )
+    if repair_reasons:
+        system_prompt += " Correct the previously invalid outputs using the supplied issue notes."
+
+    user_payload: dict[str, Any] = {"q": json.loads(compact_tasks(tasks))}
+    if repair_reasons:
+        user_payload["x"] = repair_reasons
+
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {
+                "role": "user",
+                "content": json.dumps(user_payload, ensure_ascii=False, separators=(",", ":")),
+            },
+        ],
+        "temperature": 0,
+        "max_tokens": completion_budget(tasks),
+        "stream": False,
+        "response_format": {"type": "json_object"},
+    }
+
+    try:
+        body = _perform_request(payload, api_key, url)
+    except urllib.error.HTTPError as error:
+        details = error.read().decode("utf-8", errors="replace")
+        if error.code not in (400, 422):
+            raise RuntimeError(f"Fireworks HTTP {error.code}: {details[:500]}") from error
+        log("JSON mode rejected; retrying the same model without response_format")
+        payload.pop("response_format", None)
+        body = _perform_request(payload, api_key, url)
+
+    choices = body.get("choices", [])
+    if not choices:
+        raise RuntimeError("Fireworks response contains no choices")
+    message = choices[0].get("message", {})
+    content = message.get("content")
+    if not isinstance(content, str) or not content.strip():
+        raise RuntimeError("Fireworks response contains no answer text")
+    answers = parse_batch_results(content, tasks)
+    if not answers:
+        raise RuntimeError("Remote response contained no usable answers")
+    return answers
+
+
+def call_batch(
+    tasks: list[dict[str, Any]],
+    models: list[str],
+    api_key: str,
+    url: str,
+    repair_reasons: dict[str, str] | None = None,
+) -> dict[str, str]:
+    last_error: Exception | None = None
+    for model in ordered_models(models):
+        for candidate in model_candidates(model, url):
+            try:
+                log(f"Attempting compact batch with: {candidate}")
+                return request_batch(tasks, candidate, api_key, url, repair_reasons)
+            except Exception as error:
+                last_error = error
+                log(f"Batch model {candidate} failed: {type(error).__name__}: {error}")
+    raise last_error or RuntimeError("All batch models failed")
+
+
+def resolve_local_tasks(
+    tasks: list[dict[str, Any]],
+) -> tuple[dict[str, str], list[dict[str, Any]]]:
+    answers: dict[str, str] = {}
+    unresolved: list[dict[str, Any]] = []
+
+    for task in tasks:
+        task_id = str(task["task_id"])
+        text = task_text(task)
+        if not text:
+            unresolved.append(task)
+            continue
+
+        arithmetic = solve_arithmetic(text)
+        if arithmetic.accepted and arithmetic.answer:
+            answers[task_id] = arithmetic.answer
+            log(f"Local arithmetic accept {task_id}: {arithmetic.reason}")
+            continue
+
+        sentiment = solve_sentiment(task)
+        if sentiment.accepted and sentiment.answer:
+            answers[task_id] = sentiment.answer
+            log(f"Local sentiment accept {task_id}: {sentiment.reason}")
+            continue
+
+        unresolved.append(task)
+
+    return answers, unresolved
+
+
+def main() -> int:
+    try:
+        tasks = load_tasks()
+    except Exception as error:
+        log(f"Input error: {error}")
+        write_results([])
+        return 1
+
+    local_answers, remote_tasks = resolve_local_tasks(tasks)
+    answers = dict(local_answers)
+
+    if remote_tasks:
+        try:
+            models = parse_allowed_models()
+            url = completion_url()
+            api_key = os.getenv("FIREWORKS_API_KEY", "").strip()
+            if not api_key:
+                raise ValueError("FIREWORKS_API_KEY is missing")
+
+            first = call_batch(remote_tasks, models, api_key, url)
+            valid_remote: dict[str, str] = {}
+            repair_tasks: list[dict[str, Any]] = []
+            repair_reasons: dict[str, str] = {}
+
+            for task in remote_tasks:
+                task_id = str(task["task_id"])
+                answer = first.get(task_id, "")
+                valid, reason = validate_answer(task, answer)
+                if valid:
+                    valid_remote[task_id] = answer.strip()
+                else:
+                    repair_tasks.append(task)
+                    repair_reasons[task_id] = reason
+
+            answers.update(valid_remote)
+
+            if repair_tasks:
+                log(f"Repairing {len(repair_tasks)} invalid or missing answers in one batch")
+                repaired = call_batch(
+                    repair_tasks,
+                    models,
+                    api_key,
+                    url,
+                    repair_reasons,
+                )
+                for task in repair_tasks:
+                    task_id = str(task["task_id"])
+                    answer = repaired.get(task_id, "")
+                    valid, reason = validate_answer(task, answer)
+                    if valid:
+                        answers[task_id] = answer.strip()
+                    else:
+                        log(f"Repair rejected {task_id}: {reason}")
+
+        except Exception as error:
+            log(f"Remote inference failed: {type(error).__name__}: {error}")
+
+    results = [
+        {"task_id": task["task_id"], "answer": answers.get(str(task["task_id"]), "")}
+        for task in tasks
+    ]
+    write_results(results)
+
+    completed = sum(1 for result in results if result["answer"])
+    log(
+        f"Wrote {len(results)} results; completed={completed}; "
+        f"missing={len(results) - completed}; local={len(local_answers)}; "
+        f"remote={len(remote_tasks)}"
+    )
+    return 0 if completed == len(results) else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
