@@ -1,36 +1,99 @@
 <p align="center">
-  <img src="./docs/assets/routeiq-mark.svg" width="96" alt="OmniEdge RouteIQ mark" />
+  <img
+    src="./docs/assets/routeiq-mark.svg"
+    width="104"
+    alt="OmniEdge RouteIQ mark"
+  />
 </p>
 
 <h1 align="center">OmniEdge RouteIQ</h1>
 
 <p align="center">
-  <strong>Local-first intelligent routing for private, reliable, and token-efficient AI execution.</strong>
+  <strong>
+    Local-first intelligent routing for private, reliable,
+    and token-efficient AI execution.
+  </strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/AMD%20ACT%20II-Hackathon-ED1C24?style=for-the-badge" alt="AMD ACT II Hackathon" />
-  <img src="https://img.shields.io/badge/Track-Hybrid%20Token--Efficient%20Routing-67E8F9?style=for-the-badge" alt="Hybrid Token-Efficient Routing Agent" />
+  <img
+    src="https://img.shields.io/badge/AMD%20Developer%20Hackathon-ACT%20II-ED1C24?style=for-the-badge"
+    alt="AMD Developer Hackathon ACT II"
+  />
+  <img
+    src="https://img.shields.io/badge/Track-Hybrid%20Token--Efficient%20Routing-2563EB?style=for-the-badge"
+    alt="Hybrid Token-Efficient Routing Agent"
+  />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Accuracy-100.0%25-16A34A?style=flat-square" alt="100 percent accuracy" />
-  <img src="https://img.shields.io/badge/Fireworks%20Tokens-3%2C242-F59E0B?style=flat-square" alt="3,242 Fireworks tokens" />
-  <img src="https://img.shields.io/badge/Frontend-Vercel-black?style=flat-square&logo=vercel" alt="Vercel frontend" />
-  <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=flat-square" alt="Render backend" />
+  <img
+    src="https://img.shields.io/badge/Accuracy-100.0%25-16A34A?style=flat-square"
+    alt="100 percent accuracy"
+  />
+  <img
+    src="https://img.shields.io/badge/Qualified%20Tasks-19%20of%2019-16A34A?style=flat-square"
+    alt="19 of 19 tasks"
+  />
+  <img
+    src="https://img.shields.io/badge/Fireworks%20Tokens-3%2C242-F59E0B?style=flat-square"
+    alt="3,242 Fireworks tokens"
+  />
+  <img
+    src="https://img.shields.io/badge/Observed%20Rank-30th-7C3AED?style=flat-square"
+    alt="Observed rank 30"
+  />
 </p>
 
 <p align="center">
-  <a href="https://omniedge-routeiq.vercel.app"><strong>Live Demo</strong></a>
-  ·
-  <a href="https://omniedge-routeiq-backend.onrender.com/docs"><strong>API Docs</strong></a>
-  ·
-  <a href="https://omniedge-routeiq-backend.onrender.com/status"><strong>Backend Status</strong></a>
+  <img
+    src="https://img.shields.io/badge/Frontend-Next.js-black?style=flat-square&logo=next.js"
+    alt="Next.js frontend"
+  />
+  <img
+    src="https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi"
+    alt="FastAPI backend"
+  />
+  <img
+    src="https://img.shields.io/badge/Deployment-Vercel-black?style=flat-square&logo=vercel"
+    alt="Vercel deployment"
+  />
+  <img
+    src="https://img.shields.io/badge/API-Render-46E3B7?style=flat-square"
+    alt="Render backend"
+  />
+</p>
+
+<p align="center">
+  <a href="https://omniedge-routeiq.vercel.app">
+    <strong>Live Demo</strong>
+  </a>
+  &nbsp;•&nbsp;
+  <a href="https://omniedge-routeiq-backend.onrender.com/docs">
+    <strong>API Documentation</strong>
+  </a>
+  &nbsp;•&nbsp;
+  <a href="https://omniedge-routeiq-backend.onrender.com/status">
+    <strong>Backend Status</strong>
+  </a>
+  &nbsp;•&nbsp;
+  <a href="https://github.com/kaulastudies/omniedge-routeiq">
+    <strong>Source Code</strong>
+  </a>
 </p>
 
 ---
 
 ## AMD ACT II — Final Observed Track 1 Result
+
+<!-- ROUTEIQ-SECTION-TAGS:amd-act-ii-final-observed-track-1-result -->
+<p>
+  <img src="https://img.shields.io/badge/Result-Qualified-16A34A?style=flat-square" alt="Qualified result" />
+  <img src="https://img.shields.io/badge/Accuracy-100.0%25-16A34A?style=flat-square" alt="100 percent accuracy" />
+  <img src="https://img.shields.io/badge/Tokens-3%2C242-F59E0B?style=flat-square" alt="3,242 tokens" />
+  <img src="https://img.shields.io/badge/Tasks-19%2F19-2563EB?style=flat-square" alt="19 of 19 tasks" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 The final qualified leaderboard snapshot observed near the close of the AMD Developer Hackathon: ACT II was:
 
@@ -67,6 +130,14 @@ The internal zero-Fireworks experiment remains useful research for future token 
 ---
 
 ## What RouteIQ Does
+
+<!-- ROUTEIQ-SECTION-TAGS:what-routeiq-does -->
+<p>
+  <img src="https://img.shields.io/badge/Approach-Local--First-0F766E?style=flat-square" alt="Local first" />
+  <img src="https://img.shields.io/badge/Execution-Privacy--Aware-7C3AED?style=flat-square" alt="Privacy aware" />
+  <img src="https://img.shields.io/badge/Optimization-Token--Efficient-F59E0B?style=flat-square" alt="Token efficient" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 Most AI applications send every request to the same cloud model. RouteIQ places a routing layer between the application and the inference providers.
 
@@ -107,6 +178,13 @@ The product principle is simple:
 
 ## Two Working Layers
 
+<!-- ROUTEIQ-SECTION-TAGS:two-working-layers -->
+<p>
+  <img src="https://img.shields.io/badge/Layer%201-Track%201%20Agent-2563EB?style=flat-square" alt="Track 1 scoring agent" />
+  <img src="https://img.shields.io/badge/Layer%202-Command%20Nexus-7C3AED?style=flat-square" alt="Command Nexus dashboard" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 ### 1. Track 1 scoring agent
 
 The containerized benchmark agent follows the official evaluator contract:
@@ -146,6 +224,14 @@ It includes:
 
 ## Core Features
 
+<!-- ROUTEIQ-SECTION-TAGS:core-features -->
+<p>
+  <img src="https://img.shields.io/badge/Core-Intelligent%20Routing-2563EB?style=flat-square" alt="Intelligent routing" />
+  <img src="https://img.shields.io/badge/Safety-Strict%20Validation-16A34A?style=flat-square" alt="Strict validation" />
+  <img src="https://img.shields.io/badge/Governance-Audit%20Trail-7C3AED?style=flat-square" alt="Audit trail" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 - Local-first execution for supported tasks
 - Deterministic arithmetic, sentiment, logic, code, NER, and summary handling
 - Local model inference for selected unresolved tasks
@@ -161,6 +247,15 @@ It includes:
 ---
 
 ## Product Architecture
+
+<!-- ROUTEIQ-SECTION-TAGS:product-architecture -->
+<p>
+  <img src="https://img.shields.io/badge/Frontend-Next.js-black?style=flat-square&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/API-FastAPI-009688?style=flat-square&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Agent-Python-3776AB?style=flat-square&logo=python" alt="Python" />
+  <img src="https://img.shields.io/badge/Runtime-Docker-2496ED?style=flat-square&logo=docker" alt="Docker" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 ```text
 User or application
@@ -197,6 +292,15 @@ Dashboard visualization
 
 ## Live Links
 
+<!-- ROUTEIQ-SECTION-TAGS:live-links -->
+<p>
+  <img src="https://img.shields.io/badge/Demo-Live-16A34A?style=flat-square" alt="Live demo" />
+  <img src="https://img.shields.io/badge/Frontend-Vercel-black?style=flat-square&logo=vercel" alt="Vercel" />
+  <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=flat-square" alt="Render" />
+  <img src="https://img.shields.io/badge/Repository-GitHub-181717?style=flat-square&logo=github" alt="GitHub" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 | Layer | Link |
 |---|---|
 | Frontend demo | https://omniedge-routeiq.vercel.app |
@@ -207,6 +311,14 @@ Dashboard visualization
 ---
 
 ## API Endpoints
+
+<!-- ROUTEIQ-SECTION-TAGS:api-endpoints -->
+<p>
+  <img src="https://img.shields.io/badge/API-REST-2563EB?style=flat-square" alt="REST API" />
+  <img src="https://img.shields.io/badge/Framework-FastAPI-009688?style=flat-square&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Format-JSON-F59E0B?style=flat-square" alt="JSON" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 ```text
 GET  /status
@@ -236,6 +348,15 @@ curl -X POST \
 
 ## Demo Scenarios
 
+<!-- ROUTEIQ-SECTION-TAGS:demo-scenarios -->
+<p>
+  <img src="https://img.shields.io/badge/Route-Local-0F766E?style=flat-square" alt="Local route" />
+  <img src="https://img.shields.io/badge/Route-Cloud-2563EB?style=flat-square" alt="Cloud route" />
+  <img src="https://img.shields.io/badge/Route-Hybrid-7C3AED?style=flat-square" alt="Hybrid route" />
+  <img src="https://img.shields.io/badge/Route-Fallback-F59E0B?style=flat-square" alt="Fallback route" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 | Scenario | Demonstrates |
 |---|---|
 | `local_sensitive_prompt` | Privacy-aware local-first routing |
@@ -246,6 +367,16 @@ curl -X POST \
 ---
 
 ## Tech Stack
+
+<!-- ROUTEIQ-SECTION-TAGS:tech-stack -->
+<p>
+  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python" alt="Python" />
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/FastAPI-API-009688?style=flat-square&logo=fastapi" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Docker-Container-2496ED?style=flat-square&logo=docker" alt="Docker" />
+  <img src="https://img.shields.io/badge/Fireworks-AI-F59E0B?style=flat-square" alt="Fireworks AI" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 ### Scoring agent
 
@@ -279,6 +410,14 @@ curl -X POST \
 
 ## Team and Current Ownership
 
+<!-- ROUTEIQ-SECTION-TAGS:team-and-current-ownership -->
+<p>
+  <img src="https://img.shields.io/badge/Team-Core%20Contributors-2563EB?style=flat-square" alt="Core contributors" />
+  <img src="https://img.shields.io/badge/Workflow-Clear%20Ownership-16A34A?style=flat-square" alt="Clear ownership" />
+  <img src="https://img.shields.io/badge/Quality-QA%20%26%20Verification-7C3AED?style=flat-square" alt="QA and verification" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 The table below separates core hackathon ownership from responsibilities assigned for continued project development.
 
 | Member | Current ownership |
@@ -311,6 +450,14 @@ See [docs/TEAM_OWNERSHIP.md](docs/TEAM_OWNERSHIP.md) for the detailed operating 
 
 ## Local Development
 
+<!-- ROUTEIQ-SECTION-TAGS:local-development -->
+<p>
+  <img src="https://img.shields.io/badge/Backend-Python-3776AB?style=flat-square&logo=python" alt="Python backend" />
+  <img src="https://img.shields.io/badge/Frontend-Node.js-339933?style=flat-square&logo=node.js" alt="Node.js frontend" />
+  <img src="https://img.shields.io/badge/Quality-Automated%20Tests-16A34A?style=flat-square" alt="Automated tests" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 ### Backend
 
 ```bash
@@ -335,6 +482,14 @@ Never commit real credentials. Store only placeholders in `.env.example`.
 ---
 
 ## Deployment
+
+<!-- ROUTEIQ-SECTION-TAGS:deployment -->
+<p>
+  <img src="https://img.shields.io/badge/Frontend-Vercel-black?style=flat-square&logo=vercel" alt="Vercel" />
+  <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=flat-square" alt="Render" />
+  <img src="https://img.shields.io/badge/Containers-GHCR-181717?style=flat-square&logo=github" alt="GitHub Container Registry" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 ### Render backend
 
@@ -370,6 +525,14 @@ NEXT_PUBLIC_API_BASE_URL=https://omniedge-routeiq-backend.onrender.com
 
 ## Repository Structure
 
+<!-- ROUTEIQ-SECTION-TAGS:repository-structure -->
+<p>
+  <img src="https://img.shields.io/badge/Structure-Monorepo-2563EB?style=flat-square" alt="Monorepo" />
+  <img src="https://img.shields.io/badge/Included-Tests-16A34A?style=flat-square" alt="Tests included" />
+  <img src="https://img.shields.io/badge/Included-Documentation-7C3AED?style=flat-square" alt="Documentation included" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 ```text
 omniedge-routeiq/
 ├── backend/
@@ -404,6 +567,14 @@ omniedge-routeiq/
 
 ## Post-Hackathon Priorities
 
+<!-- ROUTEIQ-SECTION-TAGS:post-hackathon-priorities -->
+<p>
+  <img src="https://img.shields.io/badge/Stage-Continuing%20R%26D-7C3AED?style=flat-square" alt="Continuing research" />
+  <img src="https://img.shields.io/badge/Priority-Regression%20Safety-16A34A?style=flat-square" alt="Regression safety" />
+  <img src="https://img.shields.io/badge/Next-Pilot%20Validation-2563EB?style=flat-square" alt="Pilot validation" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
+
 1. Preserve the final scored image, result evidence, and submission history.
 2. Reproduce the 19-task benchmark under a documented local test harness.
 3. Improve local factual-answer reliability without overfitting to one test set.
@@ -415,6 +586,14 @@ omniedge-routeiq/
 ---
 
 ## Documentation
+
+<!-- ROUTEIQ-SECTION-TAGS:documentation -->
+<p>
+  <img src="https://img.shields.io/badge/Docs-Architecture-2563EB?style=flat-square" alt="Architecture documentation" />
+  <img src="https://img.shields.io/badge/Docs-Demo%20Guide-7C3AED?style=flat-square" alt="Demo guide" />
+  <img src="https://img.shields.io/badge/Docs-Testing-16A34A?style=flat-square" alt="Testing documentation" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 Start with the [documentation index](docs/README.md).
 
@@ -430,6 +609,14 @@ Key records:
 ---
 
 ## Project Status
+
+<!-- ROUTEIQ-SECTION-TAGS:project-status -->
+<p>
+  <img src="https://img.shields.io/badge/Status-Working%20Prototype-16A34A?style=flat-square" alt="Working prototype" />
+  <img src="https://img.shields.io/badge/Evaluation-100.0%25%20Accuracy-16A34A?style=flat-square" alt="100 percent accuracy" />
+  <img src="https://img.shields.io/badge/Stage-Continuing%20R%26D-7C3AED?style=flat-square" alt="Continuing R and D" />
+</p>
+<!-- /ROUTEIQ-SECTION-TAGS -->
 
 OmniEdge RouteIQ is a **working hackathon prototype and continuing R&D project**. The repository includes a live product demonstration, a backend routing API, benchmark-agent experiments, test tooling, and evaluation evidence.
 
