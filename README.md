@@ -1,14 +1,32 @@
 <p align="center">
-  <img src="docs/assets/routeiq-mark.svg" alt="OmniEdge RouteIQ mark" width="110" />
+  <img src="./docs/assets/routeiq-mark.svg" width="96" alt="OmniEdge RouteIQ mark" />
 </p>
 
-# OmniEdge RouteIQ
+<h1 align="center">OmniEdge RouteIQ</h1>
 
-**A local-first AI routing control plane for token efficiency, privacy-aware execution, cloud escalation, fallback reliability, and explainable audit trails.**
+<p align="center">
+  <strong>Local-first intelligent routing for private, reliable, and token-efficient AI execution.</strong>
+</p>
 
-[Live Demo](https://omniedge-routeiq.vercel.app) ·
-[API Docs](https://omniedge-routeiq-backend.onrender.com/docs) ·
-[Backend Status](https://omniedge-routeiq-backend.onrender.com/status)
+<p align="center">
+  <img src="https://img.shields.io/badge/AMD%20ACT%20II-Hackathon-ED1C24?style=for-the-badge" alt="AMD ACT II Hackathon" />
+  <img src="https://img.shields.io/badge/Track-Hybrid%20Token--Efficient%20Routing-67E8F9?style=for-the-badge" alt="Hybrid Token-Efficient Routing Agent" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Accuracy-100.0%25-16A34A?style=flat-square" alt="100 percent accuracy" />
+  <img src="https://img.shields.io/badge/Fireworks%20Tokens-3%2C242-F59E0B?style=flat-square" alt="3,242 Fireworks tokens" />
+  <img src="https://img.shields.io/badge/Frontend-Vercel-black?style=flat-square&logo=vercel" alt="Vercel frontend" />
+  <img src="https://img.shields.io/badge/Backend-Render-46E3B7?style=flat-square" alt="Render backend" />
+</p>
+
+<p align="center">
+  <a href="https://omniedge-routeiq.vercel.app"><strong>Live Demo</strong></a>
+  ·
+  <a href="https://omniedge-routeiq-backend.onrender.com/docs"><strong>API Docs</strong></a>
+  ·
+  <a href="https://omniedge-routeiq-backend.onrender.com/status"><strong>Backend Status</strong></a>
+</p>
 
 ---
 
