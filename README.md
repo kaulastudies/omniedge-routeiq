@@ -19,12 +19,12 @@ The final qualified leaderboard snapshot observed near the close of the AMD Deve
 | Metric | Final observed result |
 |---|---:|
 | Track | Hybrid Token-Efficient Routing Agent |
-| Leaderboard position | **15th** |
+| Leaderboard position | **30th** |
 | Accuracy | **100.0%** |
-| Fireworks tokens | **3,296** |
+| Fireworks tokens | **3,242** |
 | Qualified tasks | **19 of 19** |
 | Initial qualified baseline | 12,531 tokens at 84.2% accuracy |
-| Token reduction from initial baseline | **73.7%** |
+| Token reduction from initial baseline | **74.1%** |
 | Status | Qualified, scored, and preserved |
 
 After reaching 100% accuracy, the team stopped further high-risk token experiments and preserved the scored candidate to avoid regressions, schema errors, timeouts, or infrastructure failures.
@@ -38,11 +38,11 @@ After reaching 100% accuracy, the team stopped further high-risk token experimen
 | Early qualified run | 84.2% | 12,531 | Established a valid scoring baseline |
 | Major optimization | 94.7% | 3,974 | Reached the top 10 in an earlier snapshot |
 | Local-first experiment | 89.5% | 3,421 | Lower token use, but accuracy regressed |
-| Final scored run | **100.0%** | **3,296** | Reached the observed **15th position** with all 19 tasks correct |
+| Final scored run | **100.0%** | **3,242** | Latest verified score, observed at **30th position**, with all 19 tasks correct |
 
 ### Final experimental learning
 
-Before the final score, the v1.8.1 single-pass candidate reached 18 of 19 in the internal benchmark. The later official evaluator run achieved 100% accuracy with 3,296 Fireworks tokens, confirming that the final candidate resolved the remaining benchmark case.
+Before the final score, the v1.8.1 single-pass candidate reached 18 of 19 in the internal benchmark. The later official evaluator run achieved 100% accuracy with 3,242 Fireworks tokens, confirming that the final candidate resolved the remaining benchmark case.
 
 The internal zero-Fireworks experiment remains useful research for future token reduction, while the 100% scored candidate is preserved as the final benchmark baseline.
 
@@ -268,6 +268,7 @@ The table below separates core hackathon ownership from responsibilities assigne
 | **Rama Chandra** | Founder and Product/Architecture Lead. Owns product direction, routing architecture, benchmark strategy, backend decisions, Docker scoring flow, final technical approval, partnerships, and future pilot direction. |
 | **Nabothan** | Frontend and UI Contributor. Owns Command Nexus interface work, route visualization, dashboard usability, frontend integration quality, and presentation polish. |
 | **Rameen** | QA, Product, and Documentation Contributor. Owns functional QA, scenario testing, demo-flow review, submission-story support, documentation review, and backend simulation validation. |
+| **[Franklin Josva](https://github.com/franklinjosva2605-dot)** | Final Verification and Documentation Contributor. Supports final leaderboard-result verification, final GHCR image validation, README review, and public-link QA. |
 | **Priyanka Pandey** | Project Operations and Documentation Support. Owns README maintenance, benchmark evidence records, release notes, public-link verification, project archive upkeep, issue-status summaries, and post-hackathon documentation coordination. |
 
 ### Responsibilities moved from the founder to Priyanka Pandey
