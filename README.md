@@ -36,12 +36,12 @@
     alt="19 of 19 tasks"
   />
   <img
-    src="https://img.shields.io/badge/Fireworks%20Tokens-3%2C242-F59E0B?style=flat-square"
-    alt="3,242 Fireworks tokens"
+    src="https://img.shields.io/badge/Fireworks%20Tokens-3%2C118-F59E0B?style=flat-square"
+    alt="3,118 Fireworks tokens"
   />
   <img
     src="https://img.shields.io/badge/Observed%20Rank-30th-7C3AED?style=flat-square"
-    alt="Observed rank 30"
+    alt="Final rank 31"
   />
 </p>
 
@@ -84,48 +84,51 @@
 
 ---
 
-## AMD ACT II — Final Observed Track 1 Result
+## AMD ACT II — Final Track 1 Result
 
-<!-- ROUTEIQ-SECTION-TAGS:amd-act-ii-final-observed-track-1-result -->
-<p>
-  <img src="https://img.shields.io/badge/Result-Qualified-16A34A?style=flat-square" alt="Qualified result" />
-  <img src="https://img.shields.io/badge/Accuracy-100.0%25-16A34A?style=flat-square" alt="100 percent accuracy" />
-  <img src="https://img.shields.io/badge/Tokens-3%2C242-F59E0B?style=flat-square" alt="3,242 tokens" />
-  <img src="https://img.shields.io/badge/Tasks-19%2F19-2563EB?style=flat-square" alt="19 of 19 tasks" />
-</p>
-<!-- /ROUTEIQ-SECTION-TAGS -->
+![Qualified result](https://img.shields.io/badge/Status-Qualified-16a34a?style=for-the-badge)
+![100 percent accuracy](https://img.shields.io/badge/Accuracy-100.0%25-2563eb?style=for-the-badge)
+![3,118 tokens](https://img.shields.io/badge/Fireworks_tokens-3%2C118-7c3aed?style=for-the-badge)
+![19 of 19 tasks](https://img.shields.io/badge/Tasks-19%2F19-f59e0b?style=for-the-badge)
 
-The final qualified leaderboard snapshot observed near the close of the AMD Developer Hackathon: ACT II was:
+OmniEdge RouteIQ officially completed the AMD Developer Hackathon: ACT II Track 1 evaluation as a **qualified and scored submission**.
 
-| Metric | Final observed result |
+| Metric | Final result |
 |---|---:|
 | Track | Hybrid Token-Efficient Routing Agent |
-| Leaderboard position | **30th** |
+| Final leaderboard position | **31st** |
 | Accuracy | **100.0%** |
-| Fireworks tokens | **3,242** |
-| Qualified tasks | **19 of 19** |
+| Fireworks tokens | **3,118** |
+| Correct evaluator tasks | **19 of 19** |
 | Initial qualified baseline | 12,531 tokens at 84.2% accuracy |
-| Token reduction from initial baseline | **74.1%** |
-| Status | Qualified, scored, and preserved |
-
-After reaching 100% accuracy, the team stopped further high-risk token experiments and preserved the scored candidate to avoid regressions, schema errors, timeouts, or infrastructure failures.
-
-> This is the final leaderboard result observed by the team. Prize decisions, manual reviews, or organizer-side adjustments may be reported separately.
+| Token reduction from initial baseline | **75.1%** |
+| Previous protected result | 3,242 tokens at 100.0% accuracy |
+| Improvement over protected result | **124 fewer tokens** |
+| Last resubmitted | July 13, 2026 at 17:36 IST |
+| Final score checked | July 13, 2026 at 18:37 IST |
+| Final status | **Qualified and scored** |
 
 ### Benchmark progression
 
 | Stage | Accuracy | Fireworks tokens | Outcome |
 |---|---:|---:|---|
 | Early qualified run | 84.2% | 12,531 | Established a valid scoring baseline |
-| Major optimization | 94.7% | 3,974 | Reached the top 10 in an earlier snapshot |
-| Local-first experiment | 89.5% | 3,421 | Lower token use, but accuracy regressed |
-| Final scored run | **100.0%** | **3,242** | Latest verified score, observed at **30th position**, with all 19 tasks correct |
+| Major optimization | 94.7% | 3,974 | Improved accuracy while sharply reducing token use |
+| Local-first experiment | 89.5% | 3,421 | Reduced tokens, but accuracy regressed |
+| Previous protected run | 100.0% | 3,242 | First fully correct 19-of-19 result |
+| **Final qualified run** | **100.0%** | **3,118** | **Final score at 31st position with all 19 tasks correct** |
 
-### Final experimental learning
+### Closing result
 
-Before the final score, the v1.8.1 single-pass candidate reached 18 of 19 in the internal benchmark. The later official evaluator run achieved 100% accuracy with 3,242 Fireworks tokens, confirming that the final candidate resolved the remaining benchmark case.
+The final submission improved token usage by **124 tokens** compared with the previous protected 100% result while preserving complete benchmark accuracy.
 
-The internal zero-Fireworks experiment remains useful research for future token reduction, while the 100% scored candidate is preserved as the final benchmark baseline.
+The team also explored deterministic, hybrid, and zero-token routing approaches. Some experimental candidates exposed important lessons around task completeness, exact `task_id` preservation, output validation, evaluator timing, and safe rollback strategy.
+
+The final evaluated result remains the authoritative project benchmark:
+
+> **100.0% accuracy · 3,118 Fireworks tokens · 19/19 tasks · Qualified**
+
+This project will continue as a local-first routing research and product-development effort beyond the hackathon.
 
 ---
 
