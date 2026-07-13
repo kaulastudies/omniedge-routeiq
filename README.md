@@ -423,8 +423,8 @@ The table below separates core hackathon ownership from responsibilities assigne
 | Member | Current ownership |
 |---|---|
 | **Rama Chandra** | Founder and Product/Architecture Lead. Owns product direction, routing architecture, benchmark strategy, backend decisions, Docker scoring flow, final technical approval, partnerships, and future pilot direction. |
-| **Nabothan** | Frontend and UI Contributor. Owns Command Nexus interface work, route visualization, dashboard usability, frontend integration quality, and presentation polish. |
-| **Rameen** | QA, Product, and Documentation Contributor. Owns functional QA, scenario testing, demo-flow review, submission-story support, documentation review, and backend simulation validation. |
+| **[Nabothan](https://github.com/Nabothdaniel)** | Frontend and UI Contributor. Owns Command Nexus interface work, route visualization, dashboard usability, frontend integration quality, and presentation polish. |
+| **[Rameen](https://github.com/r2meen)** | QA, Product, and Documentation Contributor. Owns functional QA, scenario testing, demo-flow review, submission-story support, documentation review, and backend simulation validation. |
 | **[Franklin Josva](https://github.com/franklinjosva2605-dot)** | Final Verification and Documentation Contributor. Supports final leaderboard-result verification, final GHCR image validation, README review, and public-link QA. |
 | **Priyanka Pandey** | Project Operations and Documentation Support. Owns README maintenance, benchmark evidence records, release notes, public-link verification, project archive upkeep, issue-status summaries, and post-hackathon documentation coordination. |
 
