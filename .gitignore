@@ -1,0 +1,13 @@
+# Dev scripts
+start*.sh
+*.sh
+
+# Dev directories
+frontend-2/
+
+# OS files
+.DS_Store
+
+# Common ignores
+node_modules/
+.env

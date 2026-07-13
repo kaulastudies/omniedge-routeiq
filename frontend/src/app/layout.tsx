@@ -1,20 +1,24 @@
+import "@/styles.css";
+import { type ReactNode } from "react";
 import type { Metadata } from "next";
-import "./globals.css";
+
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "OmniEdge RouteIQ | Command Nexus",
-  description:
-    "Hybrid AI routing layer for local inference, cloud escalation, fallback reliability, token savings, and audit trails.",
+  title: "OmniEdge RouteIQ Dashboard",
+  description: "Monitor and simulate AI routing intelligence in real-time.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
+          <div id="root">{children}</div>
+          <Toaster richColors closeButton position="top-center" />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
