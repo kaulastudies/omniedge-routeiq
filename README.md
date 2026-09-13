@@ -40,7 +40,7 @@
     alt="3,118 Fireworks tokens"
   />
   <img
-    src="https://img.shields.io/badge/Observed%20Rank-30th-7C3AED?style=flat-square"
+    src="https://img.shields.io/badge/Observed%20Rank-31st-7C3AED?style=flat-square"
     alt="Final rank 31"
   />
 </p>
